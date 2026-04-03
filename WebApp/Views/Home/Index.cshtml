@@ -1,0 +1,118 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+@model HomeViewModel
+
+<div class="container-fluid px-3 px-lg-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+        <h5 class="mb-0 fw-semibold">Lost Pets Near You</h5>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-danger"
+                    onclick="PetModule.openCreateModal()"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createPetModal">
+                + Report Lost
+            </button>
+
+            @* <a href="/Sightings/Create" class="btn btn-sm btn-outline-success"> not implemenet yet *@
+            <a href="" class="btn btn-sm btn-outline-success">
+                + Sighting
+            </a>
+        </div>
+    </div>
+
+    <!-- MAP + LIST -->
+    <div class="row mt-3">
+
+        <!-- MAP -->
+        <div class="col-12 col-lg-8">
+            <div id="mainMap" class="w-100 rounded" style="height:65vh;"></div>
+        </div>
+
+        <!-- NEARBY LIST -->
+        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
+            <div class="d-flex flex-column" style="height:65vh;">
+
+                <div class="pb-2 border-bottom">
+                    <strong class="small text-muted">Have You Seen Me?</strong>
+                </div>
+
+                <div id="nearbyList" class="flex-grow-1 overflow-auto">
+                    <!-- will be filled with JS -->
+                    <!-- Example item -->
+                    <!--
+                    <div class="nearby-item py-2 border-bottom">
+                        <div class="fw-semibold">Bella</div>
+                        <div class="text-muted small">Lost 2 days ago • 1.2 km away</div> todo
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RECENT -->
+    <div class="row mt-4">
+
+        <!-- LOST -->
+        <div class="col-12 col-lg-6">
+            <div class="pb-2 border-bottom mb-2">
+                <strong class="small text-muted">Recently lost</strong>
+            </div>
+
+            @foreach (var pet in Model.LostPets)
+            {
+                <div class="pet-row d-flex align-items-center py-2 border-bottom"
+                     onclick="PetModule.openEditModal(@pet.PetId, false)">
+
+                    <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"
+                         class="rounded me-3"
+                         style="width:56px;height:56px;object-fit:cover;" />
+
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">@pet.Name</div>
+                        <div class="text-muted small">@pet.Description</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- FOUND -->
+        <div class="col-12 col-lg-6 mt-4 mt-lg-0">
+            <div class="pb-2 border-bottom mb-2">
+                <strong class="small text-muted">Recently found</strong>
+            </div>
+
+            @foreach (var pet in Model.FoundPets)
+            {
+                <div class="pet-row d-flex align-items-center py-2 border-bottom"
+                     onclick="PetModule.openEditModal(@pet.PetId, false)">
+
+                    <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"
+                         class="rounded me-3"
+                         style="width:56px;height:56px;object-fit:cover;" />
+
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">@pet.Name</div>
+                        <div class="text-muted small">@(pet.Status == Contracts.Enums.PetStatus.Reunited ? "Reunited" : "Crossed the rainbow bridge") </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+
+</div>
+
+<partial name="_CreatePetModal" />
+
+@section Scripts {
+    <script src="~/js/pets.js"></script>
+    <script>
+        PetModule.initHomePage();
+    </script>
+}

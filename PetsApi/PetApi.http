@@ -1,0 +1,80 @@
+@HYSMe.Api_HostAddress = https://localhost:7001
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsInN1YiI6ImM3Y2VhMTBkLTYyNzQtNDc4ZS05ODc2LWIwY2FkNzA3MmZkMSIsIm5hbWVpZCI6ImM3Y2VhMTBkLTYyNzQtNDc4ZS05ODc2LWIwY2FkNzA3MmZkMSIsIm5hbWUiOiJhZG1pbkBlbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJuYmYiOjE3NzUyMjIxMTgsImV4cCI6MTc3NTgyNjkxOCwiaWF0IjoxNzc1MjIyMTE4LCJpc3MiOiJoeXNtZS1hdXRoLWFwaSIsImF1ZCI6Imh5c21lLWNsaWVudCJ9.YP8Am_5ksbKwo67D5vKpVLRFD8ndZqtInL6cXa_-Xj8
+
+### Get all pets
+GET {{HYSMe.Api_HostAddress}}/api/pets
+Accept: application/json
+
+###
+
+### Get pet by id
+GET {{HYSMe.Api_HostAddress}}/api/pets/1
+Accept: application/json
+
+###
+
+### Query pets (pagination + filters)
+GET {{HYSMe.Api_HostAddress}}/api/pets/query?PageNumber=1&ItemPerPage=5
+Accept: application/json
+
+###
+
+### Query pets by status (example LOST = 0, FOUND = 1 — adjust if needed)
+GET {{HYSMe.Api_HostAddress}}/api/pets/query?Statuses=0&PageNumber=1&ItemPerPage=10
+Accept: application/json
+
+###
+
+### Get pets in area
+GET {{HYSMe.Api_HostAddress}}/api/pets/area?North=57.0&South=56.0&East=25.0&West=24.0
+Accept: application/json
+
+###
+
+### Create new pet (requires auth!)
+POST {{HYSMe.Api_HostAddress}}/api/pets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Max",
+  "type": "Dog",
+  "breed": "Labrador",
+  "color": "Black",
+  "description": "Very friendly",
+  "latitude": 56.95,
+  "longitude": 24.10,
+  "dateLost": "2026-04-01T10:00:00",
+  "lastSeenAddress": "Riga center",
+  "status": 0,
+  "imageUrl": null
+}
+
+###
+
+### Update pet (requires auth + owner)
+PUT {{HYSMe.Api_HostAddress}}/api/pets/15
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Max Updated",
+  "type": "Dog",
+  "breed": "Labrador",
+  "color": "Black",
+  "description": "Updated description",
+  "latitude": 56.95,
+  "longitude": 24.10,
+  "dateLost": "2026-04-01T10:00:00",
+  "lastSeenAddress": "Riga center",
+  "status": 0,
+  "imageUrl": null
+}
+
+###
+
+### Delete pet (ADMIN only)
+DELETE {{HYSMe.Api_HostAddress}}/api/pets/15
+Authorization: Bearer {{token}}
+
+###

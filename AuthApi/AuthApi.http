@@ -1,0 +1,23 @@
+@AuthAPI_HostAddress = http://localhost:5277
+
+POST {{AuthAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+{
+  "username": "admin@email.com",
+  "password": "Admin01!"
+}
+
+###
+
+POST {{AuthAPI_HostAddress}}/api/auth/register
+Content-Type: application/json
+{
+  "name": "test",
+  "password": "1234",
+  "phoneNumber": "1234",
+  "email": "1234",
+  "role": "user"
+  
+}
+
+###

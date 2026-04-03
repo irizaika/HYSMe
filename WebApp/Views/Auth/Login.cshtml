@@ -1,0 +1,38 @@
+﻿@using WebApp.Models
+<!-- LOGIN PAGE -->
+@model LoginViewModel
+
+<div class="d-flex justify-content-center align-items-center" style="height:70vh" >
+    <div class="card shadow-sm p-4" style="max-width:400px; width:100%; height:auto;">
+        <div class="text-center mb-4">
+            <h3 class="fw-semibold">Login</h3>
+        </div>
+
+        <form method="post" novalidate>
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label visually-hidden">Username</label>
+                <input asp-for="UserName" class="form-control form-control" placeholder="Username" />
+                <span asp-validation-for="UserName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label visually-hidden">Password</label>
+                <input asp-for="Password" type="password" class="form-control form-control" placeholder="Password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-success btn">Login</button>
+            </div>
+
+            <div class="text-center small">
+                Don't have an account? <a href="/Auth/Register">Register here</a>
+            </div>
+        </form>
+        @TempData["Error"]
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,77 @@
+# =========================
+# BUILD OUTPUT
+# =========================
+bin/
+obj/
+out/
+
+# =========================
+# USER / IDE FILES
+# =========================
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# =========================
+# LOGS
+# =========================
+*.log
+
+# =========================
+# ENV / SECRETS
+# =========================
+appsettings.Development.json
+appsettings.*.json
+
+# Optional: keep base config
+!appsettings.json
+
+# =========================
+# NODE (if you ever add frontend tools)
+# =========================
+node_modules/
+npm-debug.log*
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# PUBLISH / ARTIFACTS
+# =========================
+publish/
+*.publishproj
+
+# =========================
+# DATABASE / LOCAL FILES
+# =========================
+*.mdf
+*.ldf
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+
+# =========================
+# FILE UPLOADS
+# =========================
+WebApp/wwwroot/images/pets/
+
+# =========================
+# TEMP FILES
+# =========================
+*.tmp
+*.temp
+
+# =========================
+# Frontend libraries
+# =========================
+WebApp/wwwroot/lib/

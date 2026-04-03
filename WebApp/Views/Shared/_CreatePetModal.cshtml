@@ -1,0 +1,113 @@
+﻿@{
+
+}
+
+<!-- Modal report lost pet-->
+<div class="modal fade" id="createPetModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Report Lost Pet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <!-- LEFT: FORM -->
+                    <div class="col-lg-6 col-12">
+                        <form id="createPetForm">
+                            <input type="hidden" name="PetId" id="PetId" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Name *</label>
+                                    <input type="text" class="form-control" name="Name" id="Name" required />
+                                </div>
+
+                                <div class="col-md-6 mb-2">
+                                    <label>Type *</label>
+                                    <input type="text" class="form-control" name="Type" id="Type" placeholder="Dog, Cat..." required />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Breed</label>
+                                    <input type="text" class="form-control" name="Breed" id="Breed" />
+                                </div>
+
+                                <div class="col-md-6 mb-2">
+                                    <label>Color</label>
+                                    <input type="text" class="form-control" name="Color" id="Color" />
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Description *</label>
+                                <textarea class="form-control" name="Description" id="Description" required></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Latitude *</label>
+                                    <input type="number" step="any" class="form-control" name="Latitude" id="Latitude" required />
+                                </div>
+
+                                <div class="col-md-6 mb-2">
+                                    <label>Longitude *</label>
+                                    <input type="number" step="any" class="form-control" name="Longitude" id="Longitude" required />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label>Date Lost</label>
+                                    <input type="date" class="form-control" name="DateLost" id="DateLost" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label>Status</label>
+ 
+                                    <select type="dropdown" name="Status" id="Status" class="form-select">
+                                        @* @foreach (var s in ViewBag.Statuses) todo
+                                {
+                                    <option value="@s.Value">@s.Text</option>
+                                } *@
+                                        <option value="0">Lost</option>
+                                        <option value="1">Reunited</option>
+                                        <option value="2">Deceased</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                    <label>Last Seen Address</label>
+                                    <input type="text" class="form-control" name="LastSeenAddress" id="LastSeenAddress" />
+        
+                            </div>
+
+                            <div class="mb-2">
+                                <label>Image URL</label>                              
+                                <input type="file" class="form-control" name="ImageFile" id="ImageFile" accept="image/*" />
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- RIGHT: MAP -->
+                    <div class="col-lg-6 col-12">
+                        <div id="modalMap" style="height: 200px; width: 100%; border-radius: 10px;" class="mb-lg-4"></div>
+                        <img id="preview" style="max-width:100%; display:none;" />
+                    
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="submit" class="btn btn-primary" onclick="PetModule.submitPet()">Add</button>
+            </div>
+
+        </div>
+    </div>
+</div>

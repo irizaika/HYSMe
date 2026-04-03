@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HYSMe</title>
+    <script type="importmap"></script>
+    <script>
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme) {
+                document.documentElement.setAttribute("data-bs-theme", savedTheme);
+            }
+    </script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HYSMe.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body class="d-flex flex-column h-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+
+                <!-- LEFT: Logo -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">HYSMe</a>
+
+                <!-- RIGHT (ALWAYS VISIBLE): Theme + User -->
+                <div class="d-flex align-items-center gap-2 order-lg-2">
+
+                    <!-- Theme toggle -->
+                    <button onclick="toggleTheme()" id="themeToggle" class="btn btn-sm">
+                        <i id="iconMoon" class="bi bi-moon"></i>
+                        <i id="iconSun" class="bi bi-sun d-none"></i>
+                    </button>
+
+                    <!-- User -->
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+                                @User.Identity.Name
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    @* Todo Correct action when implemented *@
+                                    <a class="dropdown-item" asp-controller="Pets" asp-action="Index">
+                                        My Pets
+                                    </a>
+                                </li>
+                                @* <li>
+                                    <a class="dropdown-item" asp-controller="Home" asp-action="Privacy">
+                                        Privacy
+                                    </a>
+                                </li> *@
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger"
+                                           asp-controller="Auth"
+                                           asp-action="Logout">
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+
+                        <!-- LOGIN / REGISTER -->
+                        <!-- Desktop only -->
+                        <div class="d-none d-lg-flex gap-2">
+                            <ul class="navbar-nav me-auto mt-3 mt-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
+                                </li>
+                            </ul>
+                        </div>
+
+         
+                        
+                    }
+
+                    <!-- Hamburger -->
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mainNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <!-- COLLAPSIBLE MENU -->
+                <div class="collapse navbar-collapse order-lg-1" id="mainNav">
+                    <ul class="navbar-nav me-auto mt-3 mt-lg-0">
+
+                        <!-- Main nav -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Pets" asp-action="Index">Lost Pets</a>
+                        </li>
+
+                        <!-- MOBILE ONLY: Login/Register -->
+                        @* @if (!User.Identity.IsAuthenticated) *@
+                        @if (User?.Identity?.IsAuthenticated != true)
+                        {
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+    <div class="container flex-grow-1">
+        <main role="main" class="pb-4">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - HYSMe - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
