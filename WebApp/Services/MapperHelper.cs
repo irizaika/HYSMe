@@ -20,8 +20,7 @@ namespace WebApp.Services
             ImageUrl = vm.ImageUrl,
             LastSeenAddress = vm.LastSeenAddress,
             Status = vm.Status,
-            IsOwner = vm.IsOwner
-            //UserId = "" // is added from Claim
+            IsOwner = vm.IsOwner,
         };
 
         public static PetViewModel MapToEntity(PetDto dto) => new()
@@ -38,7 +37,8 @@ namespace WebApp.Services
             ImageUrl = dto.ImageUrl,
             LastSeenAddress = dto.LastSeenAddress,
             Status = dto.Status,
-            IsOwner = dto.IsOwner
+            IsOwner = dto.IsOwner,
+            Sightings = dto.Sightings.Select(MapToEntity).ToList()
         };
 
         public static LoginViewModel MapToEntity(LoginRequestDto dto) => new()
@@ -69,6 +69,34 @@ namespace WebApp.Services
             Name = dto.Name,
             Password = dto.Password,
             PhoneNumber = dto.PhoneNumber
+        };
+
+        public static SightingDto MapToDto(PetSightingViewModel vm) => new()
+        {
+            Id = vm.Id,
+            PetId = vm.PetId,
+            Comment = vm.Comment,
+            Latitude = vm.Latitude,
+            Longitude = vm.Longitude,
+            DateSeen = vm.DateSeen ?? DateTime.UtcNow,
+            ImageUrl = vm.ImageUrl,
+            SeenAddress = vm.SeenAddress,
+            ReporterEmail = vm.ReporterEmail,
+            ReporterName = vm.ReporterName
+        };
+
+        public static PetSightingViewModel MapToEntity(SightingDto dto) => new()
+        {
+            Id = dto.Id,
+            PetId = dto.PetId,
+            Comment = dto.Comment,
+            Latitude = dto.Latitude,
+            Longitude = dto.Longitude,
+            DateSeen = dto.DateSeen,
+            ImageUrl = dto.ImageUrl,
+            SeenAddress = dto.SeenAddress,
+            ReporterEmail = dto.ReporterEmail,
+            ReporterName = dto.ReporterName
         };
     }
 }

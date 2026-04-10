@@ -3,7 +3,6 @@ using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
 using Newtonsoft.Json;
-using System.Security.Claims;
 using WebApp.Models;
 using WebApp.Services.Interfaces;
 using WebApp.Services;
@@ -122,9 +121,6 @@ namespace WebApp.Controllers
 
             var dto = MapperHelper.MapToDto(model);
             
-           // dto.UserId = User.FindFirst("sub")?.Value ?? "";
-         //   dto.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!; //not working
-
             var response = await _petService.CreatePetAsync(dto);
 
             if (response != null && response.IsSuccess)
@@ -155,8 +151,6 @@ namespace WebApp.Controllers
                 model.ImageUrl = null;
             }
 
-            //  model.UserId = User.FindFirst("sub")?.Value ?? "";
-
             var pet = MapperHelper.MapToDto(model);
 
             var response = await _petService.UpdatePetAsync(model.PetId.Value, pet);
@@ -184,10 +178,6 @@ namespace WebApp.Controllers
 
             if (response != null && response.IsSuccess)
             {
-                //var pets = JsonConvert.DeserializeObject<List<PetDto>>(
-                //    Convert.ToString(response.Result)
-                //);
-
                 var json = Convert.ToString(response.Result) ?? "[]";
                 var petDtos = JsonConvert.DeserializeObject<List<PetDto>>(json) ?? [];
 
@@ -196,6 +186,25 @@ namespace WebApp.Controllers
                 return Json(pets);
             }
             return BadRequest(response?.Message);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var response = await _petService.GetPetByIdAsync(id);
+
+            if (response == null || !response.IsSuccess || response.Result == null)
+                return NotFound();
+
+            var json = Convert.ToString(response.Result) ?? "{}";
+            var petDto = JsonConvert.DeserializeObject<PetDto>(json);
+
+            if (petDto == null)
+                return NotFound();
+
+            var pet = MapperHelper.MapToEntity(petDto);
+
+            return View(pet); // or return View(pet) if you switch model
         }
     }
 }

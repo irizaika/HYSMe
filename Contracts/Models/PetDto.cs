@@ -47,5 +47,7 @@ namespace Contracts.Models
         public PetStatus Status { get; set; }
 
         public bool IsOwner { get; set; }
+
+        public List<SightingDto> Sightings { get; set; } = new();
     }
 }

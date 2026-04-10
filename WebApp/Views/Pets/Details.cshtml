@@ -1,0 +1,166 @@
+﻿@using Contracts.Enums
+@{
+    ViewData["Title"] = "Pet Details";
+
+}
+@model PetViewModel
+
+
+<div class="container-fluid px-3 px-lg-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+        <div>
+            <h4 class="mb-0 fw-semibold">@Model.Name</h4>
+            <div class="text-muted small">
+                @Model.Type • @Model.Breed • @Model.Color
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            @if (Model.IsOwner)
+            {
+                <button class="btn btn-outline-primary"
+                        onclick="PetDetailsModule.enableEdit()">
+                    Edit
+                </button>
+            }
+
+            <button class="btn btn-success"
+                    onclick="SightingController.openModal(@Model.PetId, @Model.Latitude, @Model.Longitude)">
+                👁️ I have seen this pet
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="row">
+
+        <!-- MAP -->
+        <div class="col-12 col-lg-8 mt-3">
+            <div id="detailsMap"
+                 class="w-100 rounded"
+                 style="height:60vh;"></div>
+        </div>
+
+        <!-- INFO PANEL -->
+        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/no-image.png" : Model.ImageUrl)"
+                         class="mb-3 rounded"
+                         style="max-height:220px; max-width:100%; object-fit:cover;" />
+
+                    <div class="mb-2">
+                        <strong>Status:</strong>
+                        <span class="badge bg-warning text-dark">
+                            @(@Model.Status == PetStatus.Deceased ? "In loving memory" : @Model.Status)
+                        </span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Last seen:</strong><br />
+                        <span class="text-muted">@Model.LastSeenAddress</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Date lost:</strong><br />
+                        <span class="text-muted">
+                            @Model.DateLost?.ToString("yyyy-MM-dd")
+                        </span>
+                    </div>
+
+                    <hr />
+
+                    <div>
+                        <strong>Description</strong>
+                        <div class="text-muted small">
+                            @Model.Description
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SIGHTINGS -->
+    <div class="row mt-4">
+        <div class="col-12">
+
+            <div class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                <strong class="small text-muted">Sightings</strong>
+            </div>
+
+            <div id="sightingsList" class="mt-2">
+
+                @if (Model.Sightings != null && Model.Sightings.Any())
+                {
+                    foreach (var s in Model.Sightings.OrderByDescending(x => x.DateSeen))
+                    {
+                        <div class="p-3 border-bottom sighting-item"
+                             onclick="PetDetailsModule.focusSighting(@s.Latitude, @s.Longitude)">
+
+                            <div class="d-flex justify-content-between">
+                                <div class="fw-semibold">
+                                    Seen @s.DateSeen?.ToString("yyyy-MM-dd HH:mm")
+                                </div>
+                            </div>
+
+                            <div class="text-muted small">
+                                @s.Comment
+                            </div>
+
+                            <div class="text-muted small">
+                                📍 @s.Latitude, @s.Longitude
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted small p-2">
+                        No sightings yet
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<partial name="_CreatePetSightingModal" />
+
+@section Scripts {
+    <script src="~/js/pets.js"></script>
+    <script src="~/js/mapService.js"></script>
+    <script src="~/js/petService.js"></script>
+    <script src="~/js/petDetailsModule.js"></script>
+    <script src="~/js/sightingController.js"></script>
+    <script src="~/js/navigationHelper.js"></script>
+
+    <script>
+        const petModel = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+        SightingController.init({
+            petService: PetService,
+            mapService: MapService
+        });
+
+        PetDetailsModule.initModule({
+            mapService: MapService,
+            petService: PetService,
+            sightingController: SightingController,
+            navigationHelper: NavigationHelper,
+            isAuthenticated: true
+        });
+
+        PetDetailsModule.init(petModel);
+    </script>
+}

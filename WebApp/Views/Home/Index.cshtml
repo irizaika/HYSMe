@@ -11,16 +11,9 @@
 
         <div class="d-flex gap-2">
             <button class="btn btn-sm btn-outline-danger"
-                    onclick="PetModule.openCreateModal()"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createPetModal">
+                    onclick="PetPageController.handleReportClick()">
                 + Report Lost
             </button>
-
-            @* <a href="/Sightings/Create" class="btn btn-sm btn-outline-success"> not implemenet yet *@
-            <a href="" class="btn btn-sm btn-outline-success">
-                + Sighting
-            </a>
         </div>
     </div>
 
@@ -67,7 +60,7 @@
             @foreach (var pet in Model.LostPets)
             {
                 <div class="pet-row d-flex align-items-center py-2 border-bottom"
-                     onclick="PetModule.openEditModal(@pet.PetId, false)">
+                    onclick="NavigationHelper.goToPetDetails(@pet.PetId)">
 
                     <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"
                          class="rounded me-3"
@@ -90,7 +83,7 @@
             @foreach (var pet in Model.FoundPets)
             {
                 <div class="pet-row d-flex align-items-center py-2 border-bottom"
-                     onclick="PetModule.openEditModal(@pet.PetId, false)">
+                     onclick="NavigationHelper.goToPetDetails(@pet.PetId)">
 
                     <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"
                          class="rounded me-3"
@@ -109,10 +102,51 @@
 </div>
 
 <partial name="_CreatePetModal" />
+<partial name="_CreatePetSightingModal" />
 
 @section Scripts {
-    <script src="~/js/pets.js"></script>
+    <script src="~/js/petPageController.js"></script>
+    <script src="~/js/petModalController.js"></script>
+    <script src="~/js/petService.js"></script>
+    <script src="~/js/mapService.js"></script>
+    <script src="~/js/petFormController.js"></script>
+    <script src="~/js/petRenderer.js"></script>
+    <script src="~/js/sightingController.js"></script>
+    <script src="~/js/navigationHelper.js"></script>
     <script>
-        PetModule.initHomePage();
+
+        PetPageController.init({
+            petService: PetService,
+            petModalController: PetModalController,
+            mapService: MapService,
+            sightingController: SightingController,
+            petFormController: PetFormController,
+            petRenderer: PetRenderer,
+            navigationHelper: NavigationHelper,
+            isAuthenticated: @User.Identity.IsAuthenticated.ToString().ToLower()
+        });
+        
+        PetModalController.init({
+                petFormController: PetFormController,
+              petService: PetService,
+              mapService: MapService
+          });
+
+        PetRenderer.init({
+            mapService: MapService
+        });
+        
+        PetFormController.init({
+            petService: PetService,
+        });
+  
+        SightingController.init({
+            petService: PetService,
+            mapService: MapService
+        });
+
+        PetPageController.initHomePage();
     </script>
+
+
 }

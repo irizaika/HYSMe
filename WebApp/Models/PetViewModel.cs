@@ -37,6 +37,8 @@ namespace WebApp.Models
 
         public bool IsOwner { get;  set; }
 
+        public List<PetSightingViewModel> Sightings { get; set; } = [];
+
         //public bool IsOwner { get; private set; }
 
         //public void SetOwnership(bool isOwner)

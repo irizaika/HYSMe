@@ -22,6 +22,7 @@ namespace PetsApi.Mapping
             //UserId = p.UserId,
             Status = p.Status,
             IsOwner = false,// will be changed after, if needed
+            Sightings = p.Sightings.Select(MapToDto).ToList()
 
         };
 
@@ -39,7 +40,9 @@ namespace PetsApi.Mapping
             ImageUrl = dto.ImageUrl,
             LastSeenAddress = dto.LastSeenAddress,
            // UserId = dto.UserId, // to be set in service alyer
-            Status = dto.Status
+            Status = dto.Status,
+            Sightings = dto.Sightings.Select(MapToEntity).ToList()
+
         };
 
 
@@ -51,8 +54,11 @@ namespace PetsApi.Mapping
             ImageUrl = s.ImageUrl,
             Latitude = s.Latitude,
             Longitude = s.Longitude,
+            SeenAddress = s.SeenAddress,
             DateSeen = s.DateSeen,
-            UserId = s.UserId
+            ReporterName = s.ReporterName,
+            ReporterEmail = s.ReporterEmail,
+
         };
 
         public static Sighting MapToEntity(SightingDto dto) => new()
@@ -63,8 +69,10 @@ namespace PetsApi.Mapping
             ImageUrl = dto.ImageUrl,
             Latitude = dto.Latitude,
             Longitude = dto.Longitude,
+            SeenAddress = dto.SeenAddress,
             DateSeen = dto.DateSeen,
-            UserId = dto.UserId ?? ""
+            ReporterName = dto.ReporterName,
+            ReporterEmail = dto.ReporterEmail,
         };
     }
 }

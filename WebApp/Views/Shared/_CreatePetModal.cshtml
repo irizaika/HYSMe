@@ -17,58 +17,58 @@
                     <!-- LEFT: FORM -->
                     <div class="col-lg-6 col-12">
                         <form id="createPetForm">
-                            <input type="hidden" name="PetId" id="PetId" />
+                            <input type="hidden" name="PetId" id="petPetId" />
 
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Name *</label>
-                                    <input type="text" class="form-control" name="Name" id="Name" required />
+                                    <input type="text" class="form-control" name="Name" id="petName" required />
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Type *</label>
-                                    <input type="text" class="form-control" name="Type" id="Type" placeholder="Dog, Cat..." required />
+                                    <input type="text" class="form-control" name="Type" id="petType" placeholder="Dog, Cat..." required />
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Breed</label>
-                                    <input type="text" class="form-control" name="Breed" id="Breed" />
+                                    <input type="text" class="form-control" name="Breed" id="petBreed" />
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Color</label>
-                                    <input type="text" class="form-control" name="Color" id="Color" />
+                                    <input type="text" class="form-control" name="Color" id="petColor" />
                                 </div>
                             </div>
 
                             <div class="mb-2">
                                 <label>Description *</label>
-                                <textarea class="form-control" name="Description" id="Description" required></textarea>
+                                <textarea class="form-control" name="Description" id="petDescription" required></textarea>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Latitude *</label>
-                                    <input type="number" step="any" class="form-control" name="Latitude" id="Latitude" required />
+                                    <input type="number" step="any" class="form-control" name="Latitude" id="petLatitude" required />
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Longitude *</label>
-                                    <input type="number" step="any" class="form-control" name="Longitude" id="Longitude" required />
+                                    <input type="number" step="any" class="form-control" name="Longitude" id="petLongitude" required />
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Date Lost</label>
-                                    <input type="date" class="form-control" name="DateLost" id="DateLost" />
+                                    <input type="date" class="form-control" name="DateLost" id="petDateLost" />
                                 </div>
                                 <div class="col-md-6 mb-2">
                                     <label>Status</label>
  
-                                    <select type="dropdown" name="Status" id="Status" class="form-select">
+                                    <select type="dropdown" name="Status" id="petStatus" class="form-select">
                                         @* @foreach (var s in ViewBag.Statuses) todo
                                 {
                                     <option value="@s.Value">@s.Text</option>
@@ -82,13 +82,13 @@
 
                             <div class="mb-2">
                                     <label>Last Seen Address</label>
-                                    <input type="text" class="form-control" name="LastSeenAddress" id="LastSeenAddress" />
+                                    <input type="text" class="form-control" name="LastSeenAddress" id="petLastSeenAddress" />
         
                             </div>
 
                             <div class="mb-2">
                                 <label>Image URL</label>                              
-                                <input type="file" class="form-control" name="ImageFile" id="ImageFile" accept="image/*" />
+                                <input type="file" class="form-control" name="ImageFile" id="petImageFile" accept="image/*" />
                             </div>
 
                         </form>
@@ -96,16 +96,15 @@
 
                     <!-- RIGHT: MAP -->
                     <div class="col-lg-6 col-12">
-                        <div id="modalMap" style="height: 200px; width: 100%; border-radius: 10px;" class="mb-lg-4"></div>
-                        <img id="preview" style="max-width:100%; display:none;" />
-                    
+                        <div id="modalPetMap" style="height: 200px; width: 100%; border-radius: 10px;" class="mb-lg-4"></div>
+                        <img id="petPreview" style="max-width:100%; display:none;" />              
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button id="submit" class="btn btn-primary" onclick="PetModule.submitPet()">Add</button>
+                <button id="submit" class="btn btn-primary" onclick="PetFormController.submitPet()">Add</button>
             </div>
 
         </div>

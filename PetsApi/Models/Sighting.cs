@@ -20,10 +20,15 @@ namespace PetsApi.Models
         [Required]
         public double Longitude { get; set; }
 
+        public string? SeenAddress { get; set; }
         public DateTime DateSeen { get; set; } = DateTime.UtcNow;
 
-        [Required]
-        public string UserId { get; set; } = string.Empty;
+        // optional for auth users
+        public string? UserId { get; set; }
+
+        // optional two fields (for non-auth users)
+        public string? ReporterName { get; set; }
+        public string? ReporterEmail { get; set; }
 
         // Navigation
         public Pet Pet { get; set; } = null!;

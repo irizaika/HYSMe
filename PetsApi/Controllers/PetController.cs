@@ -139,7 +139,9 @@ namespace PetsApi.Controllers
         {
             try
             {
-                var pet = await _db.Pets.FirstOrDefaultAsync(p => p.Id == id);
+                var pet = await _db.Pets
+                    .Include(p => p.Sightings)
+                    .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (pet == null)
                 {

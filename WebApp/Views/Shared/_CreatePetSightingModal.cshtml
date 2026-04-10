@@ -1,0 +1,128 @@
+﻿<!-- Modal: Report Pet Sighting -->
+<div class="modal fade" id="createPetSightingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+                <h5 class="modal-title">Report Sighting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+                <div class="row">
+
+                    <!-- LEFT: FORM -->
+                    <div class="col-lg-6 col-12">
+                        <form id="createSightingForm">
+
+                            <input type="hidden" name="petId" id="sightingPetId" />
+
+                            <!-- LOCATION -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Latitude *</label>
+                                    <input type="number" step="any"
+                                           class="form-control"
+                                           id="sightingLatitude"
+                                           name="Latitude" required />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Longitude *</label>
+                                    <input type="number" step="any"
+                                           class="form-control"
+                                           id="sightingLongitude"
+                                           name="Longitude" required />
+                                </div>
+                                <div class="mb-2">
+                                    <label>Seen Address</label>
+                                    <input type="text" class="form-control" name="SeenAddress" id="sightingSeenAddress" />
+                                </div>
+                            </div>
+
+                            <!-- DATE -->
+                            <div class="mb-3">
+                                <label class="form-label">When did you see the pet?</label>
+                                <input type="datetime-local"
+                                       class="form-control"
+                                       id="sightingDateSeen"
+                                       name="DateSeen" />
+                            </div>
+
+                            <!-- COMMENT -->
+                            <div class="mb-3">
+                                <label class="form-label">Details</label>
+                                <textarea class="form-control"
+                                          id="sightingComment"
+                                          rows="3"
+                                          name="Comment"
+                                          placeholder="What was the pet doing? Condition? Direction?"></textarea>
+                            </div>
+
+                            <!-- IMAGE -->
+                            <div class="mb-3">
+                                <label class="form-label">Photo (optional)</label>
+                                <input type="file"
+                                       class="form-control"
+                                       id="sightingImageFile"
+                                       name="ImageFile"
+                                       accept="image/*" />
+                            </div>
+
+                            <!-- GUEST INFO -->
+                            <div id="guestFields">
+                                <hr />
+
+                                <div class="mb-2">
+                                    <label class="form-label small text-muted">Your name (optional)</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="sightingReporterName"
+                                           name="ReporterName" />
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label small text-muted">Contact info (email/phone)</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="sightingReporterEmail"
+                                           name="ReporterEmail" />
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- RIGHT: MAP -->
+                    <div class="col-lg-6 col-12">
+                        <div id="modalSightingMap" style="height: 200px; width: 100%; border-radius: 10px;" class="mb-lg-4"></div>
+
+                        <div class="small text-muted">
+                            Click on map to set location
+                        </div>
+
+                        <img id="singthingPreview"
+                             style="max-width:100%; display:none;" />
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button class="btn btn-light border"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button class="btn btn-danger"
+                        onclick="SightingController.submitSighting()">
+                    👁️ Report Sighting
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

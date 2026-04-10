@@ -9,9 +9,8 @@ namespace Contracts.Models
         [Required]
         public int PetId { get; set; }
 
-        [Required]
         [MaxLength(500)]
-        public string Comment { get; set; } = string.Empty;
+        public string? Comment { get; set; }
 
         [Required]
         [Range(-90, 90)]
@@ -23,8 +22,10 @@ namespace Contracts.Models
 
         public DateTime DateSeen { get; set; } = DateTime.UtcNow;
 
+        public string? SeenAddress { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ReporterName { get; set; }
+        public string? ReporterEmail { get; set; }
 
-        public string? UserId { get; set; } // later from JWT
     }
 }
