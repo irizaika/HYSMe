@@ -15,6 +15,8 @@
                 showImagePreview('petPreview', URL.createObjectURL(file));
             };
         }
+
+        enableValidationAutoClear('createPetForm');
     }
 
     function fillPetForm(pet) {
@@ -59,12 +61,25 @@
         );
 
         if (response.ok) {
-            alert(mode === FORM_MODE.EDIT ? 'Pet updated!' : 'Pet created!');
-            location.reload();
+            ////alert(mode === FORM_MODE.EDIT ? 'Pet updated!' : 'Pet created!');
+            //showToast(mode === FORM_MODE.EDIT ? 'Pet updated!' : 'Pet created!');
+            //// location.reload();
+            //setTimeout(() => location.reload(), 3000);
+
+            showToast(mode === FORM_MODE.EDIT ? 'Pet updated!' : 'Pet created!');
+
+            bootstrap.Modal
+                .getInstance(document.getElementById('createPetModal'))
+                .hide();
+
+            services.petPageController.initHomePage(); // reload data only
+
         }
         else {
-            const error = await response.json();
-            alert(error.message);
+            const errors = await response.json();
+            showValidationErrors(errors, 'createPetForm');
+            //alert(error.message);
+            showToast(errors.message??'Fix validation errors', 'error');
         }
     }
 

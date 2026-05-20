@@ -3,16 +3,12 @@ using Contracts.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using System.Data;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WebApp.Models;
 using WebApp.Services;
 using WebApp.Services.Interfaces;
-using WebApp.Utility;
 
 namespace WebApp.Controllers
 {
@@ -37,42 +33,32 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Login(LoginViewModel obj)
         {
             var login = MapperHelper.MapToDto(obj);
-            ResponseDto? responseDto = await _authService.LoginAsync(login);
 
-            if (responseDto != null && responseDto.IsSuccess)
+            var response = await _authService.LoginAsync(login);
+
+            if (response != null && response.IsSuccess && response.Data != null)
             {
-   
-                string response = Convert.ToString(responseDto.Result) ?? string.Empty;
+                var loginDto = response.Data;
 
-                LoginResponseDto? loginResponseDto =
-                    JsonConvert.DeserializeObject<LoginResponseDto>(response);
+                await SignInUser(loginDto);
+                _tokenProvider.SetToken(loginDto.Token);
 
-                if (loginResponseDto != null)
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (response?.Errors != null && response.Errors.Count > 0)
+            {
+                foreach (var error in response.Errors)
                 {
-                    await SignInUser(loginResponseDto);
-                    _tokenProvider.SetToken(loginResponseDto.Token);
-
-                    return RedirectToAction("Index", "Home");
-
+                    ModelState.AddModelError(error.Field ?? "", error.Message ?? "Login failed");
                 }
-                else
-                {
-                    //TempData["error"] = responseDto?.Message ?? "Login failed";
-                    ModelState.AddModelError(loginResponseDto?.Error?.Field??"", loginResponseDto?.Error?.Message?? "Login failed");
-                    return View(obj);
-                }
-           
             }
             else
             {
-
-                string response = Convert.ToString(responseDto?.Result) ?? "[]";
-                //Error? error = JsonConvert.DeserializeObject<Error>(response);
-                Error? error = JsonConvert.DeserializeObject<Error>(response);
-                ModelState.AddModelError(error?.Field ?? "", error?.Message ?? "Login failed");
-
-                return View(obj);
+                ModelState.AddModelError("", response?.Message ?? "Login failed");
             }
+
+            return View(obj);
         }
 
 
@@ -94,8 +80,8 @@ namespace WebApp.Controllers
         {
             var register = MapperHelper.MapToDto(obj);
 
-            ResponseDto? result = await _authService.RegisterAsync(register);
-            ResponseDto? assignRole;
+            ApiResponse<object>? result = await _authService.RegisterAsync(register);
+            ApiResponse<RegistrationResponseDto>? assignRole;
 
             if (result != null && result.IsSuccess)
             {
@@ -104,34 +90,75 @@ namespace WebApp.Controllers
                     obj.Role = Role.RoleUser;
                 }
                 assignRole = await _authService.AssignRoleAsync(register);
+                //if (assignRole != null && assignRole.IsSuccess)
+                //{
+                //    TempData["success"] = "Registration successful";
+                //    return RedirectToAction(nameof(Login));
+                //}
                 if (assignRole != null && assignRole.IsSuccess)
                 {
-                    TempData["success"] = "Registertion succesful";
-                    return RedirectToAction(nameof(Login));
+                    // auto login
+                    var loginResponse = await _authService.LoginAsync(new LoginRequestDto
+                    {
+                        UserName = register.Email,
+                        Password = register.Password
+                    });
+                    
+                    if (loginResponse != null && loginResponse.IsSuccess && loginResponse.Data != null)
+                    { 
+                        await SignInUser(loginResponse.Data);
+                        _tokenProvider.SetToken(loginResponse.Data.Token);
+
+                        TempData["success"] = "Welcome!";
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+
             }
             else
             {
-                string response = Convert.ToString(result?.Result) ?? "[]";
-                RegistrationResponseDto? errorResponse = JsonConvert.DeserializeObject<RegistrationResponseDto>(response);
+                //if (result != null && result.Errors != null && result.Errors.Any())
+                //{
+                //    var groupedErrors = result.Errors
+                //        .GroupBy(e => e.Field ?? string.Empty);
 
-                 if (errorResponse?.Errors != null && errorResponse.Errors.Any())
+                //    foreach (var group in groupedErrors)
+                //    {
+                //        var combinedMessage = string.Join("\n", 
+                //            group.Select(e => e.Message ?? "Registration failed"));
+
+                //        ModelState.AddModelError(group.Key, combinedMessage);
+                //    }
+                //}
+                //else
+                //{
+                //    ModelState.AddModelError(string.Empty, "Registration failed");
+                //}
+
+                if (result?.Errors != null && result.Errors.Count > 0)
                 {
-                    var groupedErrors = errorResponse.Errors
-                        .GroupBy(e => e.Field ?? string.Empty);
-
-                    foreach (var group in groupedErrors)
+                    foreach (var error in result.Errors)
                     {
-                        var combinedMessage = string.Join("\n", 
-                            group.Select(e => e.Message ?? "Registration failed"));
+                        //ModelState.AddModelError(error.Field ?? "", error.Message ?? "Registration failed");
+                        var groupedErrors = result.Errors
+                            .GroupBy(e => e.Field ?? string.Empty);
 
-                        ModelState.AddModelError(group.Key, combinedMessage);
+                        foreach (var group in groupedErrors)
+                        {
+                            var combinedMessage = string.Join("\n",
+                                group.Select(e => e.Message ?? "Registration failed"));
+
+                            ModelState.AddModelError(group.Key, combinedMessage);
+                        }
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Registration failed");
+                    ModelState.AddModelError("", result?.Message ?? "Registration failed");
                 }
+
+                TempData["error"] = result != null && result.Message != null && result.Message.Length > 0? result.Message : "Registration failed";
+
 
                 // ModelState.AddModelError(error?.Field ?? "Password", error?.Message ?? "Registration failed");
                 //  TempData["error"] = result!=null ? result.Message : "Registration failed";
@@ -167,6 +194,7 @@ namespace WebApp.Controllers
             var emailClaim = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Email);
             var subClaim = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub);
             var nameClaim = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Name);
+            var idClaim = jwt.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier);
             var roleClaim = jwt.Claims.FirstOrDefault(u => u.Type == "role");
 
             if (emailClaim != null)
@@ -185,6 +213,10 @@ namespace WebApp.Controllers
             if (roleClaim != null)
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value));
+            }
+            if (idClaim != null)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, idClaim.Value));
             }
 
             var principal = new ClaimsPrincipal(identity);

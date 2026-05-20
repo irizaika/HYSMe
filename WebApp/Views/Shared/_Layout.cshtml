@@ -129,6 +129,18 @@
     <div class="container flex-grow-1">
         <main role="main" class="pb-4">
             @RenderBody()
+
+            <!-- TOAST MESSGAE -->
+            <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+                <div id="appToast" class="toast align-items-center text-bg-success border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body" id="appToastBody">
+                            <!-- message here -->
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -137,6 +149,7 @@
             &copy; 2026 - HYSMe - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,8 +1,10 @@
 using AuthApi.Data;
 using AuthApi.Models;
-using AuthApi.Services.Interfaces;
 using AuthApi.Services;
+using AuthApi.Services.Interfaces;
+using Contracts.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 //using Microsoft.OpenPetsApi.Models;
 
@@ -21,9 +23,31 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Add services to the container.
 
+// Add services to the container.
 builder.Services.AddControllers();
+//catch ValidationErrorResponse here ane return ApiResponse<object> with errors
+//builder.Services.AddControllers()
+//    .ConfigureApiBehaviorOptions(options =>
+//    {
+//        options.InvalidModelStateResponseFactory = context =>
+//        {
+//            var errors = context.ModelState
+//                .Where(x => x.Value?.Errors.Count > 0)
+//                .SelectMany(x => x.Value.Errors.Select(e => new Error
+//                {
+//                    Field = x.Key,
+//                    Message = e.ErrorMessage
+//                }))
+//                .ToList();
+//            return new BadRequestObjectResult(
+//                ApiResponse<object>.Fail(errors, "Validation failed")
+//            );
+//        };
+//    })
+//    .AddXmlSerializerFormatters();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -61,15 +85,24 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-ApplyMigrations(app);
+
+
+
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    ApplyMigrations(app);
+}
+
 app.Run();
 
 static void ApplyMigrations(IApplicationBuilder app)
 {
-    using var scope = app.ApplicationServices.CreateScope();
-    var _db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (_db.Database.GetPendingMigrations().Any())
-    {
-        _db.Database.Migrate();
-    }
+
+        using var scope = app.ApplicationServices.CreateScope();
+        var _db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (_db.Database.GetPendingMigrations().Any())
+        {
+            _db.Database.Migrate();
+        }
+
 }

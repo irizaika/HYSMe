@@ -1,10 +1,10 @@
-﻿using PetsApi.Data;
-using PetsApi.Mapping;
-using PetsApi.Models;
-using Contracts.Models;
+﻿using Contracts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PetsApi.Data;
+using PetsApi.Mapping;
+using PetsApi.Models;
 
 namespace PetsApi.Controllers
 {
@@ -14,49 +14,47 @@ namespace PetsApi.Controllers
     public class PetController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly ResponseDto _response;
 
         public PetController(AppDbContext db)
         {
             _db = db;
-            _response = new ResponseDto();
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ResponseDto> Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
                 var pets = await _db.Pets.ToListAsync();
                 var userId = User.FindFirst("sub")?.Value;
 
-                _response.Result = pets.Select(p =>
+                var petsDto = pets.Select(p =>
                 {
                     var dto = MapperHelper.MapToDto(p);
                     dto.IsOwner = p.UserId == userId;
                     return dto;
-                });
+                }).ToList();
+
+                return Ok(ApiResponse<List<PetDto>>.Success(petsDto));
+
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         [HttpGet("query")]
         [AllowAnonymous]
-        public async Task<ResponseDto> QueryPets([FromQuery] PetQueryDto query)
+        public async Task<IActionResult> QueryPets([FromQuery] PetQueryDto query)
         {
             try
             {
                 IQueryable<Pet> pets = _db.Pets;
 
                 // Filter by statuses
-                if (query.Statuses != null && query.Statuses.Any())
+                if (query.Statuses != null && query.Statuses.Count > 0)
                 {
                     pets = pets.Where(p => query.Statuses.Contains(p.Status));
                 }
@@ -86,24 +84,21 @@ namespace PetsApi.Controllers
                     var dto = MapperHelper.MapToDto(p);
                     dto.IsOwner = p.UserId == userId;
                     return dto;
-                });
-
-                _response.Result = result;
+                }).ToList();
+                return Ok(ApiResponse<List<PetDto>>.Success(result));
+              //  _response.Result = result;
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
 
 
         [HttpGet("area")]
         [AllowAnonymous]
-        public async Task<ResponseDto> GetByArea([FromQuery] AreaDto area)
+        public async Task<IActionResult> GetByArea([FromQuery] AreaDto area)
         {
             try
             {
@@ -117,25 +112,24 @@ namespace PetsApi.Controllers
 
                 var userId = User.FindFirst("sub")?.Value;
 
-                _response.Result = pets.Select(p =>
+                var result  = pets.Select(p =>
                 {
                     var dto = MapperHelper.MapToDto(p);
                     dto.IsOwner = p.UserId == userId;
                     return dto;
-                });
+                }).ToList();
+                return Ok(ApiResponse<List<PetDto>>.Success(result));
+
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         [HttpGet("{id:int}")]
         [AllowAnonymous]
-        public async Task<ResponseDto> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
@@ -145,32 +139,29 @@ namespace PetsApi.Controllers
 
                 if (pet == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Pet not found";
-                    return _response;
+                    return Ok(ApiResponse<PetDto>.Fail(null, "Pet not found"));
                 }
                 var userId = User.FindFirst("sub")?.Value;
 
                  var dto = MapperHelper.MapToDto(pet);
                 dto.IsOwner = pet.UserId == userId;
 
-                _response.Result = dto;
+                return Ok(ApiResponse<PetDto>.Success(dto));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         [HttpPost]
-        public async Task<ResponseDto> Post([FromBody] PetDto dto)
+        public async Task<IActionResult> Post([FromBody] PetDto dto)
         {
             try
             {
                 var pet = MapperHelper.MapToEntity(dto);
+
+                pet.UserId = User.FindFirst("sub")?.Value;
 
                 _db.Pets.Add(pet);
                 await _db.SaveChangesAsync();
@@ -179,19 +170,16 @@ namespace PetsApi.Controllers
                 var petDto = MapperHelper.MapToDto(pet);
                 petDto.IsOwner = pet.UserId == userId;
 
-                _response.Result = petDto;
+                return Ok(ApiResponse<PetDto>.Success(petDto));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ResponseDto> Put(int id, [FromBody] PetDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] PetDto dto)
         {
             try
             {
@@ -199,17 +187,13 @@ namespace PetsApi.Controllers
 
                 if (pet == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Pet not found";
-                    return _response;
+                    return Ok(ApiResponse<PetDto>.Fail(null, "Pet not found"));
                 }
 
                 var userId = User.FindFirst("sub")?.Value;
                 if (pet.UserId != userId)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "You are not allowed to update this pet";
-                    return _response;
+                    return Ok(ApiResponse<PetDto>.Fail(null, "You are not allowed to update this pet"));
                 }
 
                 // update fields
@@ -232,20 +216,20 @@ namespace PetsApi.Controllers
 
                 await _db.SaveChangesAsync();
 
-                _response.Result = MapperHelper.MapToDto(pet);
+                var result = MapperHelper.MapToDto(pet);
+
+                return Ok(ApiResponse<PetDto>.Success(result));
+
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ResponseDto> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -253,9 +237,7 @@ namespace PetsApi.Controllers
 
                 if (pet == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Pet not found";
-                    return _response;
+                    return Ok(ApiResponse<PetDto>.Fail(null, "Pet not found"));
                 }
 
                 //only admin can delete records
@@ -269,14 +251,13 @@ namespace PetsApi.Controllers
 
                 _db.Pets.Remove(pet);
                 await _db.SaveChangesAsync();
+
+                return Ok(ApiResponse<PetDto>.Success());
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
     }
 }

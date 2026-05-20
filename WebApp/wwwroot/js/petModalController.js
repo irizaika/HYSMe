@@ -28,6 +28,10 @@
             onClick: (lat, lng) => {
                 petLatitude.value = lat;
                 petLongitude.value = lng;
+
+                //it will clear error field if any error exists
+                document.getElementById('petLatitude').dispatchEvent(new Event('input')); 
+                document.getElementById('petLongitude').dispatchEvent(new Event('input'));
             }
         });
     }

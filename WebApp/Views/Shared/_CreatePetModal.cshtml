@@ -23,11 +23,13 @@
                                 <div class="col-md-6 mb-2">
                                     <label>Name *</label>
                                     <input type="text" class="form-control" name="Name" id="petName" required />
+                                    <span class="text-danger small" data-valmsg-for="Name"></span>
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Type *</label>
                                     <input type="text" class="form-control" name="Type" id="petType" placeholder="Dog, Cat..." required />
+                                    <span class="text-danger small" data-valmsg-for="Type"></span>
                                 </div>
                             </div>
 
@@ -35,28 +37,33 @@
                                 <div class="col-md-6 mb-2">
                                     <label>Breed</label>
                                     <input type="text" class="form-control" name="Breed" id="petBreed" />
+                                    <span class="text-danger small" data-valmsg-for="Breed"></span>
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Color</label>
                                     <input type="text" class="form-control" name="Color" id="petColor" />
+                                    <span class="text-danger small" data-valmsg-for="Color"></span>
                                 </div>
                             </div>
 
                             <div class="mb-2">
                                 <label>Description *</label>
                                 <textarea class="form-control" name="Description" id="petDescription" required></textarea>
+                                <span class="text-danger small" data-valmsg-for="Description"></span>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-2">
                                     <label>Latitude *</label>
                                     <input type="number" step="any" class="form-control" name="Latitude" id="petLatitude" required />
+                                    <span class="text-danger small" data-valmsg-for="Latitude"></span>
                                 </div>
 
                                 <div class="col-md-6 mb-2">
                                     <label>Longitude *</label>
                                     <input type="number" step="any" class="form-control" name="Longitude" id="petLongitude" required />
+                                    <span class="text-danger small" data-valmsg-for="Longitude"></span>
                                 </div>
                             </div>
 
@@ -64,6 +71,7 @@
                                 <div class="col-md-6 mb-2">
                                     <label>Date Lost</label>
                                     <input type="date" class="form-control" name="DateLost" id="petDateLost" />
+                                    <span class="text-danger small" data-valmsg-for="DateLost"></span>
                                 </div>
                                 <div class="col-md-6 mb-2">
                                     <label>Status</label>
@@ -81,14 +89,15 @@
                             </div>
 
                             <div class="mb-2">
-                                    <label>Last Seen Address</label>
-                                    <input type="text" class="form-control" name="LastSeenAddress" id="petLastSeenAddress" />
-        
-                            </div>
+                                <label>Last Seen Address</label>
+                                <input type="text" class="form-control" name="LastSeenAddress" id="petLastSeenAddress" />
+                                <span class="text-danger small" data-valmsg-for="LastSeenAddress"></span>
+                           </div>
 
                             <div class="mb-2">
                                 <label>Image URL</label>                              
                                 <input type="file" class="form-control" name="ImageFile" id="petImageFile" accept="image/*" />
+                                <span class="text-danger small" data-valmsg-for="ImageFile"></span>
                             </div>
 
                         </form>

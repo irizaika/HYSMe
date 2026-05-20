@@ -104,7 +104,7 @@
             const marker = L.marker([s.Latitude, s.Longitude], {
                 icon: L.icon({
                     iconUrl: imageUrl,
-                    iconSize: [25, 25]
+                    iconSize: [30, 30]
                 })
             })
                 .addTo(map)

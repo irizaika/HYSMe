@@ -1,5 +1,5 @@
-﻿using Contracts.Models;
-using AuthApi.Services.Interfaces;
+﻿using AuthApi.Services.Interfaces;
+using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthApi.Controllers
@@ -9,74 +9,61 @@ namespace AuthApi.Controllers
     public class AuthAPIController : ControllerBase
     {
         private readonly IAuthService _authService;
-        //private readonly IMessageBus _messageBus;
-        private readonly IConfiguration _configuration;
-        protected ResponseDto _response;
-        public AuthAPIController(IAuthService authService, IConfiguration configuration)
+
+        public AuthAPIController(IAuthService authService)
         {
             _authService = authService;
-            _configuration = configuration;
-
-            _response = new();
         }
-
-
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
         {
-            var error = await _authService.Register(model);
-            if (error != null && error.Errors.Count > 0)
+            var result = await _authService.Register(model);
+
+            if (result != null && result.Count != 0) // result is error or null
             {
-                _response.IsSuccess = false;
-                _response.Message = "";
-                _response.Result = error;
-                return Ok(_response);
+                return BadRequest(ApiResponse<object>.Fail(result));
             }
-            return Ok(_response);
+
+            return Ok(ApiResponse<object>.Success(message: "User registered successfully"));
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
-            var loginResponse = await _authService.Login(model);
-            if (loginResponse.User == null)
-            {
-                _response.IsSuccess = false;
-                _response.Message = "Username or password is incorrect";
-                _response.Result = loginResponse.Error;
-                return Ok(_response); // Erro in BadRequest will be parsed as ValidationErrorResponse
-            }
-            _response.Result = loginResponse;
-            return Ok(_response);
+            var result = await _authService.Login(model);
 
+            if (result.User == null)
+            {
+                return Unauthorized(ApiResponse<List<Error>>.Fail([ 
+                    result.Error ??
+                    new Error { Field = "Password/UserName", Message = "Username or password is incorrect" } 
+                ], "Unauthorized"));
+            }
+
+            return Ok(ApiResponse<LoginResponseDto>.Success(result));
         }
 
-        [HttpPost("AssignRole")]
-        public async Task<IActionResult> AssignRole([FromBody] RegistrationRequestDto model)
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto model)
         {
-            if (model.Email != null && model.Role != null)
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Role))
             {
-                var assignRoleSuccessful = await _authService.AssignRole(model.Email, model.Role.ToUpper());
-                if (!assignRoleSuccessful)
-                {
-                    _response.IsSuccess = false;
-                    _response.Message = "Error encountered";
-                    return BadRequest(_response);
-                }
-            }
-            else
-            {
-                _response.IsSuccess = false;
-                _response.Message = "Error encountered";
-                return BadRequest(_response);
-
+                return BadRequest(ApiResponse<List<Error>>.Fail([ 
+                    new() { Field = "Email/Role", Message = "Email and Role are required" } 
+                ], "Invalid request"));
             }
 
-            return Ok(_response);
+            var success = await _authService.AssignRole(model.Email, model.Role.ToUpper());
 
+            if (!success)
+            {
+                return NotFound(ApiResponse<List<Error>>.Fail([ 
+                    new Error { Field = "Email", Message = "User not found" } 
+                ], "User not found"));
+            }
+
+            return Ok(ApiResponse<string>.Success(null, "Role assigned"));
         }
-
-
     }
 }

@@ -3,6 +3,7 @@
 
     function init(deps) {
         services = deps;
+        enableValidationAutoClear('createSightingForm');
     }
 
     function openModal(id, latitude, longitude) {
@@ -29,14 +30,27 @@
         const response = await services.petService.createSighting(formData);
 
         if (response.ok) {
-            alert('Sighting reported!');
-            location.reload();
+            //alert('Sighting reported!');
+            showToast('Sighting reported!');
+            //location.reload();
+
+            bootstrap.Modal
+                .getInstance(document.getElementById('createPetSightingModal'))
+                .hide();
+
+            services.PetDetailsModule.init(services.petModel); // reload data only
         }
         else {
-            const error = await response.json();
-            alert(error.message);
+            const errors = await response.json();
+            showValidationErrors(errors, 'createSightingForm');
+
+            //alert(error.message);
+        //    showToast(error.message, "error");
+            showToast(errors.message ?? 'Fix validation errors', 'error');
+
         }
     }
+
 
     return {
         init,

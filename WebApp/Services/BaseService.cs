@@ -17,87 +17,76 @@ namespace WebApp.Services
             _httpClientFactory = httpClientFactory;
             _tokenProvider = tokenProvider;
         }
-        public async Task<ResponseDto?> SendAsync(RequestDto requestDto, bool withBearer = true)
+
+        public async Task<ApiResponse<T>?> SendAsync<T>(RequestDto requestDto, bool withBearer = true)
         {
             try
             {
-                HttpClient client = _httpClientFactory.CreateClient("HYSMeApi");
-                HttpRequestMessage message = new();
+                var client = _httpClientFactory.CreateClient("HYSMeApi");
+
+                var message = new HttpRequestMessage
+                {
+                    RequestUri = new Uri(requestDto.Url),
+                    Method = requestDto.ApiType switch
+                    {
+                        ApiType.POST => HttpMethod.Post,
+                        ApiType.PUT => HttpMethod.Put,
+                        ApiType.DELETE => HttpMethod.Delete,
+                        _ => HttpMethod.Get
+                    }
+                };
+
                 message.Headers.Add("Accept", "application/json");
 
                 if (withBearer)
                 {
                     var token = _tokenProvider.GetToken();
-                    message.Headers.Add("Authorization", $"Bearer {token}");
+                    message.Headers.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 }
-
-                message.RequestUri = new Uri(requestDto.Url);
 
                 if (requestDto.Data != null)
                 {
-                    message.Content = new StringContent(JsonConvert.SerializeObject(requestDto.Data), Encoding.UTF8, "application/json");
+                    message.Content = new StringContent(
+                        JsonConvert.SerializeObject(requestDto.Data),
+                        Encoding.UTF8,
+                        "application/json");
                 }
 
-                HttpResponseMessage? apiResponse = null;
+                var response = await client.SendAsync(message);
 
-                message.Method = requestDto.ApiType switch
-                {
-                    ApiType.POST => HttpMethod.Post,
-                    ApiType.PUT => HttpMethod.Put,
-                    ApiType.DELETE => HttpMethod.Delete,
-                    _ => HttpMethod.Get,
-                };
+                var content = await response.Content.ReadAsStringAsync();
 
-                apiResponse = await client.SendAsync(message);
+                // try to deserialize ApiResponse<T>
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponse<T>>(content);
 
                 if (apiResponse == null)
                 {
-                    return new ResponseDto() { IsSuccess = false, Message = "Something went wrong" };
-                } 
-                else if(!apiResponse.IsSuccessStatusCode)
-                {
-
-                    switch (apiResponse.StatusCode)
+                    return new ApiResponse<T>
                     {
-                        case HttpStatusCode.NotFound:
-                            return new() { IsSuccess = false, Message = "Not Found" };
-                        case HttpStatusCode.Forbidden:
-                            return new() { IsSuccess = false, Message = "Access Denied" };
-                        case HttpStatusCode.Unauthorized:
-                            return new() { IsSuccess = false, Message = "Unauthorized" };
-                        case HttpStatusCode.InternalServerError:
-                            return new() { IsSuccess = false, Message = "Internal Server Error" };
-                        case HttpStatusCode.BadRequest:
-                            var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                            var validationError = JsonConvert.DeserializeObject<ValidationErrorResponse>(apiContent);
-
-                            var errorMessage = string.Join(" | ",
-                                validationError?.Errors?.SelectMany(e => e.Value.Select(v => $"{e.Key}: {v}")) ?? ["Bad request"]);
-
-                            return new()
-                            {
-                                IsSuccess = false,
-                                Message = errorMessage ?? ""
-                            };
-                        default:
-                            return new() { IsSuccess = false, Message = "Some error accured" };
-                    }
+                        IsSuccess = false,
+                        Message = "Failed to parse response"
+                    };
                 }
-                else
+
+                // Override success flag if HTTP failed
+                if (!response.IsSuccessStatusCode)
                 {
-                    var apiContent = await apiResponse.Content.ReadAsStringAsync();
-                    var apiResponseDto = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
-                    return apiResponseDto;
+                    apiResponse.IsSuccess = false;
                 }
+
+                return apiResponse;
+
             }
             catch (Exception ex)
             {
-                var dto = new ResponseDto
+                
+
+                return new ApiResponse<T>
                 {
-                    Message = ex.Message.ToString(),
-                    IsSuccess = false
+                    IsSuccess = false,
+                    Message = ex.Message
                 };
-                return dto;
             }
         }
     }

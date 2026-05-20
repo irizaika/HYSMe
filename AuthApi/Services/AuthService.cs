@@ -41,18 +41,28 @@ namespace AuthApi.Services
 
         public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
         {
+            if (string.IsNullOrWhiteSpace(loginRequestDto?.UserName))
+            {
+                return FailedLoginResponse("Username is required",nameof(loginRequestDto.UserName));
+            }
+
+            if (string.IsNullOrWhiteSpace(loginRequestDto?.Password))
+            {
+                return FailedLoginResponse("Password is required", nameof(loginRequestDto.Password));
+            }
+
             var user = _db.ApplicationUsers.FirstOrDefault(u => u.UserName != null && u.UserName.ToLower() == loginRequestDto.UserName.ToLower());
 
             if (user == null)
             {
-                return new LoginResponseDto() { User = null, Token = "", Error = new Error { Message = "User does not exist", Field = nameof(loginRequestDto.UserName) } };
+                return FailedLoginResponse("User does not exist", nameof(loginRequestDto.UserName));
             }
 
             bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
 
             if (user == null || isValid == false)
             {
-                return new LoginResponseDto() { User = null, Token = "", Error = new Error { Message = "Invalid password", Field = nameof(loginRequestDto.Password) } };
+                return FailedLoginResponse("Invalid password", nameof(loginRequestDto.Password));
             }
 
             //if user was found, Generate JWT Token
@@ -76,23 +86,20 @@ namespace AuthApi.Services
             return loginResponseDto;
         }
 
-        public async Task<RegistrationResponseDto> Register(RegistrationRequestDto registrationRequestDto)
+        public async Task<List<Error>?> Register(RegistrationRequestDto registrationRequestDto)
         {
             var checkIfExists = _db.ApplicationUsers.Any(u => u.UserName == registrationRequestDto.Email);
 
+            var all = _db.ApplicationUsers.ToList();
+
+            foreach (var a in all)
+            {
+               System.Diagnostics.Debug.WriteLine(a.Email);
+            }
+
             if (checkIfExists == true)
             {
-                return new RegistrationResponseDto()
-                {
-                    Errors =
-                    [
-                        new Error()
-                        {
-                            Message = "Email alredy registered",
-                            Field = "Email"
-                        }
-                    ]
-                };
+                return [new() {Message = "Email already registered", Field = "Email"}];
             }
 
             ApplicationUser user = new()
@@ -109,41 +116,23 @@ namespace AuthApi.Services
                 var result = await _userManager.CreateAsync(user, registrationRequestDto.Password);
                 if (result.Succeeded)
                 {
-                    var userToReturn = _db.ApplicationUsers.First(u => u.UserName == registrationRequestDto.Email);
+                   // var userToReturn = _db.ApplicationUsers.First(u => u.UserName == registrationRequestDto.Email);
 
                     UserDto userDto = new()
                     {
-                        Email = userToReturn.Email ?? "",
-                        ID = userToReturn.Id,
-                        Name = userToReturn.Name,
-                        PhoneNumber = userToReturn.PhoneNumber ?? ""
+                        Email = user.Email ?? "",
+                        ID = user.Id,
+                        Name = user.Name,
+                        PhoneNumber = user.PhoneNumber ?? ""
                     };
 
-                    return new RegistrationResponseDto();
-                    //[ 
-                    //    new Error()
-                    //    {
-                    //        Message = "",
-                    //        Field = ""
-                    //    } 
-                    //];
+                    return null;
                 }
                 else
                 {
                     if (result == null)
                     {
-                        return new RegistrationResponseDto()
-                        {
-                            Errors =
-                            [
-                                new Error()
-                                {
-                                    Message = "Registration failed",
-                                    Field = ""
-                                }
-                            ]
-                        };
-
+                        return [new() { Message = "Registration failed", Field = "" }];
                     }
                     var errors = result.Errors.Select(e => new Error
                     {
@@ -151,24 +140,15 @@ namespace AuthApi.Services
                         Field = MapErrorToField(e.Code)
                     }).ToList();
 
-                    return new RegistrationResponseDto() { Errors = errors };
+                    return errors;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message); //to do logging
             }
-            return new RegistrationResponseDto()
-            {
-                Errors = 
-                [
-                    new Error()
-                    {
-                        Message = "Error Encountered",
-                        Field = ""
-                    }
-                ]
-            };
+            
+            return [new() { Message = "Error Encountered", Field = "" }];
         }
 
 
@@ -178,6 +158,20 @@ namespace AuthApi.Services
             //    if (code.Contains("Email") || code.Contains("UserName")) return "Email";
 
             return "Email";
+        }
+
+        private static LoginResponseDto FailedLoginResponse(string message, string field)
+        {
+            return new LoginResponseDto()
+            {
+                User = null,
+                Token = "",
+                Error = new Error
+                {
+                    Message = message,
+                    Field = field
+                }
+            };
         }
     }
 }

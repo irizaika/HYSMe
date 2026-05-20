@@ -1,5 +1,4 @@
 ﻿using PetsApi.Models;
-using Contracts.Enums;
 using Contracts.Models;
 
 namespace PetsApi.Mapping
@@ -39,10 +38,9 @@ namespace PetsApi.Mapping
             DateLost = dto.DateLost,
             ImageUrl = dto.ImageUrl,
             LastSeenAddress = dto.LastSeenAddress,
-           // UserId = dto.UserId, // to be set in service alyer
+           // UserId = dto.UserId, // to be set in service layer
             Status = dto.Status,
             Sightings = dto.Sightings.Select(MapToEntity).ToList()
-
         };
 
 
@@ -65,7 +63,7 @@ namespace PetsApi.Mapping
         {
             Id = dto.Id ?? 0,
             PetId = dto.PetId,
-            Comment = dto.Comment,
+            Comment = dto.Comment ?? "",
             ImageUrl = dto.ImageUrl,
             Latitude = dto.Latitude,
             Longitude = dto.Longitude,

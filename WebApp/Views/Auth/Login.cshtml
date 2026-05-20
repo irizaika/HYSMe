@@ -35,4 +35,19 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = '@TempData["success"]';
+            const error = '@TempData["error"]';
+
+            if (success && success !== '') {
+                showToast(success, 'success');
+            }
+
+            if (error && error !== '') {
+                showToast(error, 'error');
+            }
+        });
+    </script>
 }

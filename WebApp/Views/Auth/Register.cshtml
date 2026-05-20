@@ -9,9 +9,10 @@
             <h3 class="fw-semibold">Register</h3>
         </div>
 
-        <form method="post" novalidate>
+        <form method="post" id="registerForm" novalidate>
             <div class="mb-3">
                 <label asp-for="Email" class="form-label visually-hidden">Email</label>
+                @* <input asp-for="Email" class="form-control" placeholder="Email" /> *@
                 <input asp-for="Email" type="email" class="form-control" placeholder="Email" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
@@ -55,4 +56,65 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = '@TempData["success"]';
+            const error = '@TempData["error"]';
+
+            if (success && success !== '') {
+                showToast(success, 'success');
+            }
+
+            if (error && error !== '') {
+                showToast(error, 'error');
+            }
+        });
+
+        // document.getElementById("registerForm").addEventListener("submit", async function (e) {
+        //     e.preventDefault();
+
+        //     const form = e.target;
+
+        //     const data = {
+        //         email: form.Email.value,
+        //         password: form.Password.value,
+        //         name: form.Name.value,
+        //         phoneNumber: form.PhoneNumber.value
+        //     };
+
+        //     const data = new FormData(document.getElementById('registerForm'));
+
+        //     try {
+        //         const response = await fetch("/Auth/Register", {
+        //             method: "POST",
+        //             headers: {
+        //                 "Content-Type": "application/json"
+        //             },
+        //             body: JSON.stringify(data)
+        //         });
+
+        //         if (response.redirected) {
+        //             MVC redirect (success case)
+        //             showToast("Registration successful", "success");
+
+        //             setTimeout(() => {
+        //                 window.location.href = response.url;
+        //             }, 1500);
+
+        //             return;
+        //         }
+
+        //         const html = await response.text();
+
+        //         Replace form with returned view (validation errors)
+        //         document.body.innerHTML = html;
+
+        //         showToast("Registration failed", "error");
+
+        //     } catch (err) {
+        //         showToast("Something went wrong", "error");
+        //     }
+        // });
+    </script>
 }

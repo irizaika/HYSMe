@@ -21,7 +21,8 @@
             @if (Model.IsOwner)
             {
                 <button class="btn btn-outline-primary"
-                        onclick="PetDetailsModule.enableEdit()">
+                    onclick="PetModalController.openEditModal(@Model.PetId, @(Model.IsOwner.ToString().ToLower()))">
+
                     Edit
                 </button>
             }
@@ -135,27 +136,44 @@
 
 </div>
 
+<partial name="_CreatePetModal" />
 <partial name="_CreatePetSightingModal" />
 
 @section Scripts {
-    <script src="~/js/pets.js"></script>
     <script src="~/js/mapService.js"></script>
     <script src="~/js/petService.js"></script>
     <script src="~/js/petDetailsModule.js"></script>
     <script src="~/js/sightingController.js"></script>
     <script src="~/js/navigationHelper.js"></script>
+    <script src="~/js/petFormController.js"></script>
+    <script src="~/js/petModalController.js"></script>
 
     <script>
         const petModel = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
 
         SightingController.init({
             petService: PetService,
-            mapService: MapService
-        });
+            mapService: MapService,
+            petDetailsModule: PetDetailsModule,
+            petModel: petModel
+        });            
+        
+        PetFormController.init({
+                  petService: PetService,
+              });
+        
+        PetModalController.init({
+                  petService: PetService,
+                    petFormController: PetFormController,
+                    mapService: MapService
+              });
+          
+  
 
         PetDetailsModule.initModule({
             mapService: MapService,
             petService: PetService,
+            petFormController: PetFormController,
             sightingController: SightingController,
             navigationHelper: NavigationHelper,
             isAuthenticated: true

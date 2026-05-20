@@ -4,6 +4,6 @@ namespace WebApp.Services.Interfaces
 {
     public interface IPetSightingService
     {
-        Task<ResponseDto?> CreatePetSightingAsync(SightingDto petDto);
+        Task<ApiResponse<SightingDto>?> CreatePetSightingAsync(SightingDto petDto);
     }
 }

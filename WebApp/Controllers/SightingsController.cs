@@ -40,7 +40,7 @@ namespace WebApp.Controllers
                 Comment = model.Comment,
                 ReporterName = model.ReporterName,
                 ReporterEmail = model.ReporterEmail,
-                DateSeen = model.DateSeen.Value,
+                DateSeen = model.DateSeen?? DateTime.UtcNow
             };
 
             var userId = User.FindFirst("sub")?.Value;

@@ -1,7 +1,6 @@
 using Contracts.Enums;
 using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Diagnostics;
 using WebApp.Models;
 using WebApp.Services;
@@ -33,10 +32,9 @@ namespace WebApp.Controllers
             };
 
             var latestLostPetsResponse = await _petService.QueryPetsAsync(homeFilterForLostPets);
-            if (latestLostPetsResponse != null && latestLostPetsResponse.IsSuccess)
-            {
-                var json = Convert.ToString(latestLostPetsResponse.Result) ?? "[]";
-                latestLostPetsDtos = JsonConvert.DeserializeObject<List<PetDto>>(json) ?? [];
+            if (latestLostPetsResponse != null && latestLostPetsResponse.IsSuccess && latestLostPetsResponse.Data != null)
+            { 
+                latestLostPetsDtos = latestLostPetsResponse.Data;
             }
 
             var homeFilterForFoundPets = new PetQueryDto
@@ -46,11 +44,10 @@ namespace WebApp.Controllers
                 Statuses = [PetStatus.Reunited, PetStatus.Deceased]
             };
 
-            var latestFoundPetsResponce = await _petService.QueryPetsAsync(homeFilterForFoundPets);
-            if (latestFoundPetsResponce != null && latestFoundPetsResponce.IsSuccess)
+            var latestFoundPetsResponse = await _petService.QueryPetsAsync(homeFilterForFoundPets);
+            if (latestFoundPetsResponse != null && latestFoundPetsResponse.IsSuccess && latestFoundPetsResponse.Data != null)
             {
-                var json = Convert.ToString(latestFoundPetsResponce.Result) ?? "[]";
-                latestFoundPetsDtos = JsonConvert.DeserializeObject<List<PetDto>>(json) ?? [];
+                latestFoundPetsDtos = latestFoundPetsResponse.Data;
             }
 
 

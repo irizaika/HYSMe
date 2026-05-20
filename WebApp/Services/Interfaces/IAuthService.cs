@@ -4,8 +4,8 @@ namespace WebApp.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<ResponseDto?> LoginAsync(LoginRequestDto loginRequestDto);
-        Task<ResponseDto?> RegisterAsync(RegistrationRequestDto registrationRequestDto);
-        Task<ResponseDto?> AssignRoleAsync(RegistrationRequestDto registrationRequestDto);
+        Task<ApiResponse<LoginResponseDto>?> LoginAsync(LoginRequestDto loginRequestDto);
+        Task<ApiResponse<object>?> RegisterAsync(RegistrationRequestDto registrationRequestDto);
+        Task<ApiResponse<RegistrationResponseDto>?> AssignRoleAsync(RegistrationRequestDto registrationRequestDto);
     }
 }

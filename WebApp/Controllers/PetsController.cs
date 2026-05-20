@@ -2,10 +2,9 @@
 using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
-using Newtonsoft.Json;
 using WebApp.Models;
-using WebApp.Services.Interfaces;
 using WebApp.Services;
+using WebApp.Services.Interfaces;
 
 namespace WebApp.Controllers
 {
@@ -27,10 +26,9 @@ namespace WebApp.Controllers
 
             var response = await _petService.GetAllPetsAsync();
 
-            if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess && response.Data != null)
             {
-                var json = Convert.ToString(response.Result) ?? "[]";
-                var petDtos = JsonConvert.DeserializeObject<List<PetDto>>(json) ?? [];
+                var petDtos = response.Data;
 
                 list = [..petDtos.Select(MapperHelper.MapToEntity)];
    
@@ -62,14 +60,9 @@ namespace WebApp.Controllers
         {
             var response = await _petService.GetPetByIdAsync(id);
 
-            if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess && response.Data != null)
             {
-                //var pet = JsonConvert.DeserializeObject<PetDto>(
-                //    Convert.ToString(response.Result)
-                //);
-
-                var json = Convert.ToString(response.Result) ?? "[]";
-                var petDto = JsonConvert.DeserializeObject<PetDto>(json) ?? new PetDto();
+                var petDto = response.Data;
 
                 var pet = MapperHelper.MapToEntity(petDto);
 
@@ -123,7 +116,7 @@ namespace WebApp.Controllers
             
             var response = await _petService.CreatePetAsync(dto);
 
-            if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess )
             {
                 return Ok();
             }
@@ -176,10 +169,9 @@ namespace WebApp.Controllers
             };
             var response = await _petService.GetPetsInArea(area);
 
-            if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess && response.Data != null)
             {
-                var json = Convert.ToString(response.Result) ?? "[]";
-                var petDtos = JsonConvert.DeserializeObject<List<PetDto>>(json) ?? [];
+                var petDtos = response.Data;
 
                 var pets = petDtos.Select(MapperHelper.MapToEntity);
 
@@ -193,18 +185,14 @@ namespace WebApp.Controllers
         {
             var response = await _petService.GetPetByIdAsync(id);
 
-            if (response == null || !response.IsSuccess || response.Result == null)
+            if (response == null || !response.IsSuccess || response.Data == null)
                 return NotFound();
 
-            var json = Convert.ToString(response.Result) ?? "{}";
-            var petDto = JsonConvert.DeserializeObject<PetDto>(json);
-
-            if (petDto == null)
-                return NotFound();
+            var petDto = response.Data;
 
             var pet = MapperHelper.MapToEntity(petDto);
 
-            return View(pet); // or return View(pet) if you switch model
+            return View(pet);
         }
     }
 }

@@ -12,19 +12,19 @@ namespace WebApp.Services
         {
             _baseService = baseService;
         }
-        public async Task<ResponseDto?> AssignRoleAsync(RegistrationRequestDto registrationRequestDto)
+        public async Task<ApiResponse<RegistrationResponseDto>?> AssignRoleAsync(RegistrationRequestDto registrationRequestDto)
         {
-            return await _baseService.SendAsync(new RequestDto()
+            return await _baseService.SendAsync<RegistrationResponseDto>(new RequestDto()
             {
                 ApiType = ApiType.POST,
                 Data = registrationRequestDto,
-                Url = SD.AuthAPIBase + "/api/auth/AssignRole"
+                Url = SD.AuthAPIBase + "/api/auth/assign-role"
             });
         }
 
-        public async Task<ResponseDto?> LoginAsync(LoginRequestDto loginRequestDto)
+        public async Task<ApiResponse<LoginResponseDto>?> LoginAsync(LoginRequestDto loginRequestDto)
         {
-            var retVal =  await _baseService.SendAsync(new RequestDto()
+            var retVal =  await _baseService.SendAsync<LoginResponseDto>(new RequestDto()
             {
                 ApiType = ApiType.POST,
                 Data = loginRequestDto,
@@ -34,9 +34,9 @@ namespace WebApp.Services
             return retVal;
         }
 
-        public async Task<ResponseDto?> RegisterAsync(RegistrationRequestDto registrationRequestDto)
+        public async Task<ApiResponse<object>?> RegisterAsync(RegistrationRequestDto registrationRequestDto)
         {
-            return await _baseService.SendAsync(new RequestDto()
+            return await _baseService.SendAsync<object>(new RequestDto()
             {
                 ApiType = ApiType.POST,
                 Data = registrationRequestDto,

@@ -31,27 +31,27 @@ namespace WebApp.Services
         //    });
         //}
 
-        public async Task<ResponseDto?> CreatePetSightingAsync(SightingDto dto)
+        public async Task<ApiResponse<SightingDto>?> CreatePetSightingAsync(SightingDto dto)
         {
-            ResponseDto? responce;
+            ApiResponse<SightingDto>? response;
             try
             {
-                responce = await _baseService.SendAsync(new RequestDto
+                response = await _baseService.SendAsync<SightingDto>(new RequestDto
                 {
                     ApiType = ApiType.POST,
                     Data = dto,
                     Url = SD.APIBase + "/api/sightings"
                 });
 
-                return responce;
+                return response;
             }
             catch
             {
-                return new ResponseDto()
+                return new ApiResponse<SightingDto>()
                 {
                     IsSuccess = false,
                     Message = "Something went wrong while creating the record. Please try again later.",
-                    Result = null
+                    Data = null
                 };
             }
         }

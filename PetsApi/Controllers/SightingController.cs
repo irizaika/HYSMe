@@ -1,8 +1,10 @@
-﻿using PetsApi.Data;
-using PetsApi.Mapping;
+﻿using Azure;
 using Contracts.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PetsApi.Data;
+using PetsApi.Mapping;
 
 namespace PetsApi.Controllers
 {
@@ -11,17 +13,15 @@ namespace PetsApi.Controllers
     public class SightingController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly ResponseDto _response;
 
         public SightingController(AppDbContext db)
         {
             _db = db;
-            _response = new ResponseDto();
         }
 
         // Get all sightings for a specific pet
         [HttpGet("pet/{petId:int}")]
-        public async Task<ResponseDto> GetByPet(int petId)
+        public async Task<IActionResult> GetByPet(int petId)
         {
             try
             {
@@ -29,20 +29,19 @@ namespace PetsApi.Controllers
                     .Where(s => s.PetId == petId)
                     .ToListAsync();
 
-                _response.Result = sightings.Select(MapperHelper.MapToDto);
+                var result = sightings.Select(MapperHelper.MapToDto).ToList();
+
+                return Ok(ApiResponse<List<SightingDto>>.Success(result));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         // Get single sighting
         [HttpGet("{id:int}")]
-        public async Task<ResponseDto> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
@@ -51,25 +50,22 @@ namespace PetsApi.Controllers
 
                 if (sighting == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Sighting not found";
-                    return _response;
+                    return BadRequest(ApiResponse<List<Error>>.Fail(null, "Sighting not found"));
                 }
 
-                _response.Result = MapperHelper.MapToDto(sighting);
+                var result = MapperHelper.MapToDto(sighting);
+
+                return Ok(ApiResponse<SightingDto>.Success(result));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         // Create new sighting
         [HttpPost]
-        public async Task<ResponseDto> Post([FromBody] SightingDto dto)
+        public async Task<IActionResult> Post([FromBody] SightingDto dto)
         {
             try
             {
@@ -78,30 +74,27 @@ namespace PetsApi.Controllers
 
                 if (!petExists)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Invalid PetId";
-                    return _response;
+                    return BadRequest(ApiResponse<List<Error>>.Fail(null, "Invalid PetId"));
                 }
 
                 var sighting = MapperHelper.MapToEntity(dto);
 
                 _db.Sightings.Add(sighting);
                 await _db.SaveChangesAsync();
+                
+                var result = MapperHelper.MapToDto(sighting);
 
-                _response.Result = MapperHelper.MapToDto(sighting);
+                return Ok(ApiResponse<SightingDto>.Success(result));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         // Update sighting
         [HttpPut("{id:int}")]
-        public async Task<ResponseDto> Put(int id, [FromBody] SightingDto dto)
+        public async Task<IActionResult> Put(int id, [FromBody] SightingDto dto)
         {
             try
             {
@@ -110,12 +103,10 @@ namespace PetsApi.Controllers
 
                 if (sighting == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Sighting not found";
-                    return _response;
+                    return BadRequest(ApiResponse<List<Error>>.Fail(null, "Sighting not found"));
                 }
 
-                sighting.Comment = dto.Comment;
+                sighting.Comment = dto.Comment??"";
                 sighting.ImageUrl = dto.ImageUrl;
                 sighting.Latitude = dto.Latitude;
                 sighting.Longitude = dto.Longitude;
@@ -123,20 +114,19 @@ namespace PetsApi.Controllers
 
                 await _db.SaveChangesAsync();
 
-                _response.Result = MapperHelper.MapToDto(sighting);
+                var result = MapperHelper.MapToDto(sighting);
+
+                return Ok(ApiResponse<SightingDto>.Success(result));
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
 
         // Delete sighting
         [HttpDelete("{id:int}")]
-        public async Task<ResponseDto> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -145,21 +135,19 @@ namespace PetsApi.Controllers
 
                 if (sighting == null)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "Sighting not found";
-                    return _response;
+                    return BadRequest(ApiResponse<List<Error>>.Fail(null, "Sighting not found"));
                 }
 
                 _db.Sightings.Remove(sighting);
                 await _db.SaveChangesAsync();
+
+                return Ok(ApiResponse<SightingDto>.Success());
+
             }
             catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.Message = ex.Message;
+                return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
-
-            return _response;
         }
     }
 }
