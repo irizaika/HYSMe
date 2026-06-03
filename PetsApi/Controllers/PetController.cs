@@ -20,6 +20,7 @@ namespace PetsApi.Controllers
             _db = db;
         }
 
+        // not used, use query pets method
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Get()
@@ -34,7 +35,7 @@ namespace PetsApi.Controllers
                     var dto = MapperHelper.MapToDto(p);
                     dto.IsOwner = p.UserId == userId;
                     return dto;
-                }).ToList();
+                }).OrderByDescending(p => p.DateLost).ToList();
 
                 return Ok(ApiResponse<List<PetDto>>.Success(petsDto));
 
@@ -60,7 +61,8 @@ namespace PetsApi.Controllers
                 }
 
                 // Filter by bounding box
-                if (query.North.HasValue && query.South.HasValue && query.East.HasValue && query.West.HasValue)
+                if (query.North.HasValue && query.South.HasValue &&
+                    query.East.HasValue && query.West.HasValue)
                 {
                     pets = pets.Where(p =>
                         p.Latitude >= query.South &&
@@ -69,8 +71,33 @@ namespace PetsApi.Controllers
                         p.Longitude <= query.East);
                 }
 
+                // Search filter
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    var words = query.Search
+                        .Trim()
+                        .ToLower()
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var word in words)
+                    {
+                        var w = word;
+
+                        pets = pets.Where(p =>
+                            (p.Name != null && p.Name.ToLower().Contains(w)) ||
+                            (p.Description != null && p.Description.ToLower().Contains(w)) ||
+                            (p.LastSeenAddress != null && p.LastSeenAddress.ToLower().Contains(w)) ||
+                            (p.Color != null && p.Color.ToLower().Contains(w)) ||
+                            (p.Breed != null && p.Breed.ToLower().Contains(w)) ||
+                            (p.Type != null && p.Type.ToLower().Contains(w))
+                        );
+                    }
+                }
+
                 // Order by latest lost/found
                 pets = pets.OrderByDescending(p => p.DateLost);
+
+                var totalCount = await pets.CountAsync();
 
                 // Pagination
                 var pagedPets = await pets
@@ -79,22 +106,28 @@ namespace PetsApi.Controllers
                     .ToListAsync();
 
                 var userId = User.FindFirst("sub")?.Value;
-                var result = pagedPets.Select(p =>
+
+                var result = new PagedResult<PetDto>
                 {
-                    var dto = MapperHelper.MapToDto(p);
-                    dto.IsOwner = p.UserId == userId;
-                    return dto;
-                }).ToList();
-                return Ok(ApiResponse<List<PetDto>>.Success(result));
-              //  _response.Result = result;
+                    Items = [.. pagedPets.Select(p =>
+                    {
+                        var dto = MapperHelper.MapToDto(p);
+                        dto.IsOwner = p.UserId == userId;
+                        return dto;
+                    })],
+
+                    TotalCount = totalCount,
+                    PageNumber = query.PageNumber,
+                    ItemPerPage = query.ItemPerPage
+                };
+
+                return Ok(ApiResponse<PagedResult<PetDto>>.Success(result));
             }
             catch (Exception ex)
             {
                 return BadRequest(ApiResponse<List<Error>>.Fail(null, ex.Message));
             }
         }
-
-
 
         [HttpGet("area")]
         [AllowAnonymous]
@@ -208,7 +241,7 @@ namespace PetsApi.Controllers
                 pet.LastSeenAddress = dto.LastSeenAddress;
                 pet.Status = dto.Status;
 
-                // do not update new picture was not added TODO add possibility to delete picture, or add mulitple pictures
+                // do not update new picture was not added TODO add possibility to delete picture, or add multiple pictures
                 if (dto.ImageUrl != null)
                 {
                     pet.ImageUrl = dto.ImageUrl;

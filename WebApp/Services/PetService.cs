@@ -13,9 +13,9 @@ namespace WebApp.Services
             _baseService = baseService;
         }
 
-        public async Task<ApiResponse<List<PetDto>>?> GetAllPetsAsync()
+        public async Task<ApiResponse<PagedResult<PetDto>>?> GetAllPetsAsync()
         {
-            return await _baseService.SendAsync<List<PetDto>>(new RequestDto
+            return await _baseService.SendAsync<PagedResult<PetDto>>(new RequestDto
             {
                 ApiType = ApiType.GET,
                 Url = SD.APIBase + "/api/pets"
@@ -33,17 +33,17 @@ namespace WebApp.Services
 
         public async Task<ApiResponse<PetDto>?> CreatePetAsync(PetDto petDto)
         {
-            ApiResponse<PetDto>? responce;
+            ApiResponse<PetDto>? response;
             try
             {
-                responce = await _baseService.SendAsync<PetDto>(new RequestDto
+                response = await _baseService.SendAsync<PetDto>(new RequestDto
                 {
                     ApiType = ApiType.POST,
                     Data = petDto,
                     Url = SD.APIBase + "/api/pets"
                 });
 
-                return responce;
+                return response;
             }
             catch
             {
@@ -75,7 +75,7 @@ namespace WebApp.Services
             });
         }
 
-        public async Task<ApiResponse<List<PetDto>>?> QueryPetsAsync(PetQueryDto filter)
+        public async Task<ApiResponse<PagedResult<PetDto>>?> QueryPetsAsync(PetQueryDto filter)
         {
             string statusQuery = "";
             if (filter.Statuses != null && filter.Statuses.Count > 0)
@@ -83,7 +83,7 @@ namespace WebApp.Services
                 statusQuery = string.Join("&", filter.Statuses.Select(s => $"statuses={s}"));
             }
 
-            return await _baseService.SendAsync<List<PetDto>>(new RequestDto
+            return await _baseService.SendAsync<PagedResult<PetDto>>(new RequestDto
             {
                 ApiType = ApiType.GET,
                 Url = $"{SD.APIBase}/api/pets/query?" +
@@ -92,7 +92,10 @@ namespace WebApp.Services
                       (filter.North.HasValue ? $"&north={filter.North}" : "") +
                       (filter.South.HasValue ? $"&south={filter.South}" : "") +
                       (filter.East.HasValue ? $"&east={filter.East}" : "") +
-                      (filter.West.HasValue ? $"&west={filter.West}" : "")
+                      (filter.West.HasValue ? $"&west={filter.West}" : "") +
+                      (!string.IsNullOrWhiteSpace(filter.Search)
+                          ? $"&search={Uri.EscapeDataString(filter.Search)}"
+                          : "")
             });
         }
 

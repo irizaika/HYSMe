@@ -1,0 +1,71 @@
+﻿@model PetsPageViewModel?
+
+@if (Model != null && Model.TotalPages > 1)
+{
+    var current = Model.CurrentPage;
+    var total = Model.TotalPages;
+
+    int windowSize = 5;
+
+    //middle part
+    int start = Math.Max(2, current - 2);
+    int end = Math.Min(total - 1, start + windowSize - 1);
+
+    // adjust when near end
+    start = Math.Max(2, end - windowSize + 1);
+
+    <div class="d-flex justify-content-center align-items-center gap-1 mt-4 flex-wrap">
+
+        @* PREVIOUS *@
+
+        <button class="page-btn" style="padding-bottom:3px"
+                onclick="loadPetsPage(@(current - 1))"  @(current <= 1 ? "disabled" : "")>
+            ‹
+        </button>
+
+
+        @* FIRST *@
+        <button class="page-btn @(current == 1 ? "active" : "")"
+                onclick="loadPetsPage(1)">
+            1
+        </button>
+
+        @* LEFT DOTS *@
+        @if (start > 2)
+        {
+            <span class="px-1 text-muted">...</span>
+        }
+
+        @* MIDDLE PAGES *@
+        @for (int i = start; i <= end; i++)
+        {
+            <button class="page-btn @(i == current ? "active" : "")"
+                    onclick="loadPetsPage(@i)">
+                @i
+            </button>
+        }
+
+        @* RIGHT DOTS *@
+        @if (end < total - 1)
+        {
+            <span class="px-1 text-muted">...</span>
+        }
+
+        @* LAST *@
+        @if (total > 1)
+        {
+            <button class="page-btn @(current == total ? "active" : "")"
+                    onclick="loadPetsPage(@total)">
+                @total
+            </button>
+        }
+
+        @* NEXT *@ 
+        <button class="page-btn" style="padding-bottom:3px"
+                onclick="loadPetsPage(@(current + 1))" @(current >= total ? "disabled" : "")>
+            ›
+        </button>
+   
+
+    </div>
+}

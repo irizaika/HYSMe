@@ -25,27 +25,27 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 // Add services to the container.
-builder.Services.AddControllers();
-//catch ValidationErrorResponse here ane return ApiResponse<object> with errors
-//builder.Services.AddControllers()
-//    .ConfigureApiBehaviorOptions(options =>
-//    {
-//        options.InvalidModelStateResponseFactory = context =>
-//        {
-//            var errors = context.ModelState
-//                .Where(x => x.Value?.Errors.Count > 0)
-//                .SelectMany(x => x.Value.Errors.Select(e => new Error
-//                {
-//                    Field = x.Key,
-//                    Message = e.ErrorMessage
-//                }))
-//                .ToList();
-//            return new BadRequestObjectResult(
-//                ApiResponse<object>.Fail(errors, "Validation failed")
-//            );
-//        };
-//    })
-//    .AddXmlSerializerFormatters();
+//builder.Services.AddControllers();
+//catch ValidationErrorResponse here ane return ApiResponse<object> with errors (for example BadRequest Register_MissingEmail_ShouldFail)
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value.Errors.Select(e => new Error
+                {
+                    Field = x.Key,
+                    Message = e.ErrorMessage
+                }))
+                .ToList();
+            return new BadRequestObjectResult(
+                ApiResponse<object>.Fail(errors, "Validation failed")
+            );
+        };
+    })
+    .AddXmlSerializerFormatters();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

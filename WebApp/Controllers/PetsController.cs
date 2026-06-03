@@ -22,20 +22,29 @@ namespace WebApp.Controllers
         // List all pets
         public async Task<IActionResult> Index()
         {
-            List<PetViewModel> list = [];
-
-            var response = await _petService.GetAllPetsAsync();
-
-            if (response != null && response.IsSuccess && response.Data != null)
+            //var response = await _petService.GetAllPetsAsync();
+            var filter = new PetQueryDto
             {
-                var petDtos = response.Data;
+                Search = "",
+                ItemPerPage = Constants.ItemsPerPage,
+                PageNumber = 1
+            };
 
-                list = [..petDtos.Select(MapperHelper.MapToEntity)];
-   
+            var response = await _petService.QueryPetsAsync(filter);
+
+            var vm = new PetsPageViewModel();
+
+            if (response != null &&
+                response.IsSuccess &&
+                response.Data != null)
+            {
+                vm.Pets = [.. response.Data.Items.Select(MapperHelper.MapToEntity)];
+
+                vm.CurrentPage = response.Data.PageNumber;
+                vm.TotalPages = response.Data.TotalPages;
+                vm.Search = "";
             }
-
-        //    ViewBag.CurrentUserId = User.FindFirst("sub")?.Value;
-            return View(list);
+            return View(vm);
         }
 
         //// Details
@@ -193,6 +202,36 @@ namespace WebApp.Controllers
             var pet = MapperHelper.MapToEntity(petDto);
 
             return View(pet);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search(
+          string? search,
+          int page = 1)
+        {
+            var filter = new PetQueryDto
+            {
+                Search = search,
+                ItemPerPage = Constants.ItemsPerPage,
+                PageNumber = page
+            };
+
+            var response = await _petService.QueryPetsAsync(filter);
+
+            var vm = new PetsPageViewModel();
+
+            if (response != null &&
+                response.IsSuccess &&
+                response.Data != null)
+            {
+                vm.Pets = [.. response.Data.Items.Select(MapperHelper.MapToEntity)];
+
+                vm.CurrentPage = response.Data.PageNumber;
+                vm.TotalPages = response.Data.TotalPages;
+                vm.Search = search;
+            }
+
+            return PartialView("_UpdatePetList", vm);
         }
     }
 }

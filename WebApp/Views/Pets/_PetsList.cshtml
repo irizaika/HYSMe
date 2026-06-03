@@ -1,0 +1,46 @@
+﻿@model PetsPageViewModel?
+
+@if (Model != null)
+{
+
+    @foreach (var pet in Model.Pets)
+    {
+        var isOwner = pet.IsOwner;
+
+        <div class="pet-row d-flex align-items-center py-2 border-bottom"
+             onclick="PetModalController.openEditModal(@pet.PetId, @(isOwner.ToString().ToLower()))">
+
+            <!-- IMAGE -->
+            <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"
+                 class="rounded me-3"
+                 style="width:64px;height:64px;object-fit:cover;" />
+
+            <!-- MAIN INFO -->
+            <div class="flex-grow-1">
+
+                <div class="d-flex justify-content-between">
+                    <div class="fw-semibold">@pet.Name</div>
+                    <div class="text-muted small">
+                        @pet.DateLost?.ToShortDateString()
+                    </div>
+                </div>
+
+                <div class="text-muted small">
+                    @pet.Type • @pet.Color
+                </div>
+
+                <div class="text-muted small text-truncate" style="max-width: 90%;">
+                    @pet.LastSeenAddress
+                </div>
+
+                @if (!string.IsNullOrEmpty(pet.Description))
+                {
+                    <div class="small mt-1 text-truncate" style="max-width: 90%;">
+                        @pet.Description
+                    </div>
+                }
+            </div>
+        </div>
+        
+    }
+}

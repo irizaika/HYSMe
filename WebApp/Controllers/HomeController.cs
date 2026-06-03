@@ -34,7 +34,7 @@ namespace WebApp.Controllers
             var latestLostPetsResponse = await _petService.QueryPetsAsync(homeFilterForLostPets);
             if (latestLostPetsResponse != null && latestLostPetsResponse.IsSuccess && latestLostPetsResponse.Data != null)
             { 
-                latestLostPetsDtos = latestLostPetsResponse.Data;
+                latestLostPetsDtos = latestLostPetsResponse.Data.Items;
             }
 
             var homeFilterForFoundPets = new PetQueryDto
@@ -47,7 +47,7 @@ namespace WebApp.Controllers
             var latestFoundPetsResponse = await _petService.QueryPetsAsync(homeFilterForFoundPets);
             if (latestFoundPetsResponse != null && latestFoundPetsResponse.IsSuccess && latestFoundPetsResponse.Data != null)
             {
-                latestFoundPetsDtos = latestFoundPetsResponse.Data;
+                latestFoundPetsDtos = latestFoundPetsResponse.Data.Items;
             }
 
 

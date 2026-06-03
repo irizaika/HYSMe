@@ -23,5 +23,12 @@ const PetService = {
             method: 'POST',
             body: formData
         });
-    }
+    },
+
+    getFiltered: async (search, page) => {
+        const url = `/Pets/Search?search=${encodeURIComponent(search)}&page=${page}`
+        const response = await fetch(url);
+        const html = await response.text();
+        return html; //partial view returned
+    },
 };

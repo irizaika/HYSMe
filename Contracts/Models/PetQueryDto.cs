@@ -4,7 +4,7 @@ namespace Contracts.Models
 {
     public class PetQueryDto
     {
-        public int ItemPerPage { get; set; } = 10;
+        public int ItemPerPage { get; set; } = Constants.ItemsPerPage;
         public int PageNumber { get; set; } = 1;
 
         public List<PetStatus>? Statuses { get; set; } // multiple statuses filter
@@ -14,5 +14,7 @@ namespace Contracts.Models
         public double? South { get; set; }
         public double? East { get; set; }
         public double? West { get; set; }
+
+        public string? Search { get; set; }
     }
 }

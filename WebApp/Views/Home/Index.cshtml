@@ -11,7 +11,7 @@
 
         <div class="d-flex gap-2">
             <button class="btn btn-sm btn-outline-danger"
-                    onclick="PetPageController.handleReportClick()">
+                    onclick="PetHomePageController.handleReportClick()">
                 + Report Lost
             </button>
         </div>
@@ -105,7 +105,7 @@
 <partial name="_CreatePetSightingModal" />
 
 @section Scripts {
-    <script src="~/js/petPageController.js"></script>
+    <script src="~/js/petHomePageController.js"></script>
     <script src="~/js/petModalController.js"></script>
     <script src="~/js/petService.js"></script>
     <script src="~/js/mapService.js"></script>
@@ -115,7 +115,7 @@
     <script src="~/js/navigationHelper.js"></script>
     <script>
 
-        PetPageController.init({
+        PetHomePageController.init({
             petService: PetService,
             petModalController: PetModalController,
             mapService: MapService,
@@ -145,7 +145,7 @@
             mapService: MapService
         });
 
-        PetPageController.initHomePage();
+        PetHomePageController.initHomePage();
     </script>
 
 

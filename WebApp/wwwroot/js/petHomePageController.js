@@ -1,4 +1,4 @@
-﻿const PetPageController = (() => {
+﻿const PetHomePageController = (() => {
     let services;
 
     function init(deps) {

@@ -72,7 +72,7 @@
                 .getInstance(document.getElementById('createPetModal'))
                 .hide();
 
-            services.petPageController.initHomePage(); // reload data only
+            services.petHomePageController.initHomePage(); // reload data only
 
         }
         else {
