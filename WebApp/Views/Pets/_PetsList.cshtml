@@ -8,7 +8,7 @@
         var isOwner = pet.IsOwner;
 
         <div class="pet-row d-flex align-items-center py-2 border-bottom"
-             onclick="PetModalController.openEditModal(@pet.PetId, @(isOwner.ToString().ToLower()))">
+             onclick="NavigationHelper.goToPetDetails(@pet.PetId)">
 
             <!-- IMAGE -->
             <img src="@(string.IsNullOrEmpty(pet.ImageUrl) ? "/images/no-image.png" : pet.ImageUrl)"

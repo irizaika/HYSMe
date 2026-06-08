@@ -1,7 +1,13 @@
 ﻿const NavigationHelper = (() => {
 
     function goToPetDetails(id) {
-        window.location.href = `/Pets/Details/${id}`;
+
+        const params = new URLSearchParams({
+            returnUrl: window.location.pathname + window.location.search
+        });
+
+        window.location.href =
+            `/Pets/Details/${id}?${params.toString()}`;
     }
 
     function goToLogin(id) {

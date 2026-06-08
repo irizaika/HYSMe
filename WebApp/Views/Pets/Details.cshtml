@@ -18,6 +18,10 @@
         </div>
 
         <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary"
+                   href="@(ViewBag.ReturnUrl ?? Url.Action("Index", "Pets"))">
+                ← Back
+            </a>
             @if (Model.IsOwner)
             {
                 <button class="btn btn-outline-primary"

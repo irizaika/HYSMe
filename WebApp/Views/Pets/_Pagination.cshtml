@@ -19,14 +19,14 @@
         @* PREVIOUS *@
 
         <button class="page-btn" style="padding-bottom:3px"
-                onclick="loadPetsPage(@(current - 1))"  @(current <= 1 ? "disabled" : "")>
+                onclick="LostPetPageController.loadPetsPage(@(current - 1))"  @(current <= 1 ? "disabled" : "")>
             ‹
         </button>
 
 
         @* FIRST *@
         <button class="page-btn @(current == 1 ? "active" : "")"
-                onclick="loadPetsPage(1)">
+                onclick="LostPetPageController.loadPetsPage(1)">
             1
         </button>
 
@@ -40,7 +40,7 @@
         @for (int i = start; i <= end; i++)
         {
             <button class="page-btn @(i == current ? "active" : "")"
-                    onclick="loadPetsPage(@i)">
+                    onclick="LostPetPageController.loadPetsPage(@i)">
                 @i
             </button>
         }
@@ -55,14 +55,14 @@
         @if (total > 1)
         {
             <button class="page-btn @(current == total ? "active" : "")"
-                    onclick="loadPetsPage(@total)">
+                    onclick="LostPetPageController.loadPetsPage(@total)">
                 @total
             </button>
         }
 
         @* NEXT *@ 
         <button class="page-btn" style="padding-bottom:3px"
-                onclick="loadPetsPage(@(current + 1))" @(current >= total ? "disabled" : "")>
+                onclick="LostPetPageController.loadPetsPage(@(current + 1))" @(current >= total ? "disabled" : "")>
             ›
         </button>
    

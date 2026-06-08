@@ -20,14 +20,14 @@ namespace WebApp.Controllers
         }
 
         // List all pets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, int page = 1)
         {
             //var response = await _petService.GetAllPetsAsync();
             var filter = new PetQueryDto
             {
-                Search = "",
+                Search = search ?? "",
                 ItemPerPage = Constants.ItemsPerPage,
-                PageNumber = 1
+                PageNumber = page
             };
 
             var response = await _petService.QueryPetsAsync(filter);
@@ -190,8 +190,10 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id, string? returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
+
             var response = await _petService.GetPetByIdAsync(id);
 
             if (response == null || !response.IsSuccess || response.Data == null)

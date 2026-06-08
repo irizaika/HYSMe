@@ -48,15 +48,10 @@ const PetDetailsModule = (() => {
         services.sightingController.openModal(pet);
     }
 
-    function enableEdit(id) {
-        services.navigationHelper.goToPetDetails(id);
-    }
-
     return {
         initModule,
         init,
         focusSighting,
-        openSightingModal,
-        enableEdit
+        openSightingModal
     };
 })();
