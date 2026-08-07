@@ -56,6 +56,7 @@ namespace PetsApi.Mapping
             DateSeen = s.DateSeen,
             ReporterName = s.ReporterName,
             ReporterEmail = s.ReporterEmail,
+            PetName = s.Pet?.Name ?? ""
 
         };
 

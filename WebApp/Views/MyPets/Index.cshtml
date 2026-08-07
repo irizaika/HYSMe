@@ -1,0 +1,233 @@
+﻿@model MyPetsViewModel
+
+@{
+    ViewData["Title"] = "My Pets";
+}
+
+<div class="container-fluid px-3 px-lg-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+        <div>
+            <h4 class="mb-0 fw-semibold">My Pets</h4>
+            <div class="text-muted small">
+                Manage your pets and sightings
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <ul class="nav nav-pills mt-3 mb-3" id="myPetsTabs" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    id="pets-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#pets-panel"
+                    type="button">
+                My Pets
+                <span class="badge bg-secondary ms-1">
+                    @Model.MyPets.Count
+                </span>
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    id="sightings-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#sightings-panel"
+                    type="button">
+                My Sightings
+                <span class="badge bg-secondary ms-1">
+                    @Model.MySightings.Count
+                </span>
+            </button>
+        </li>
+
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- MY PETS -->
+        <div class="tab-pane fade show active"
+             id="pets-panel">
+
+            @if (Model.MyPets.Any())
+            {
+                @foreach (var pet in Model.MyPets)
+                {
+                    <div class="card shadow-sm border-0 mb-3">
+
+                        <div class="card-body">
+
+                            <div class="row align-items-center">
+
+                                <!-- IMAGE -->
+                                <div class="col-auto">
+                                    <img src="@(string.IsNullOrEmpty(pet.ImageUrl)
+                                                                                                                     ? "/images/no-image.png"
+                                                                                                                     : pet.ImageUrl)"
+                                         class="rounded"
+                                         style="width:90px;height:90px;object-fit:cover;" />
+                                </div>
+
+                                <!-- INFO -->
+                                <div class="col">
+
+                                    <div class="fw-semibold fs-5">
+                                        @pet.Name
+                                    </div>
+
+                                    <div class="text-muted small">
+                                        @pet.Type • @pet.Breed • @pet.Color
+                                    </div>
+
+                                    <div class="text-muted small mt-1">
+                                        📍 @pet.LastSeenAddress
+                                    </div>
+
+                                    <div class="text-muted small">
+                                        Lost:
+                                        @pet.DateLost?.ToString("yyyy-MM-dd")
+                                    </div>
+
+                                </div>
+
+                                <!-- ACTIONS -->
+                                <div class="col-12 col-md-auto mt-3 mt-md-0">
+
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                               asp-controller="Pets"
+                                               asp-action="Details"
+                                               asp-route-id="@pet.PetId">
+                                            View
+                                        </a>
+
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                onclick="PetModalController.openEditModal(@pet.PetId, true)">
+                                            Edit
+                                        </button>
+
+                                        <button class="btn btn-outline-danger btn-sm"
+                                                onclick="confirmDeletePet(@pet.PetId)">
+                                            Delete
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    You have not reported any pets yet.
+                </div>
+            }
+
+        </div>
+
+        <!-- MY SIGHTINGS -->
+        <div class="tab-pane fade"
+             id="sightings-panel">
+
+            @if (Model.MySightings.Any())
+            {
+                @foreach (var sighting in Model.MySightings)
+                {
+                    <div class="card shadow-sm border-0 mb-3">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between">
+
+                                <div>
+
+                                    <div class="fw-semibold">
+                                        @sighting.PetName <!--PetName to do add name here-->
+                                    </div>
+
+                                    <div class="text-muted small">
+                                        Seen:
+                                        @sighting.DateSeen?.ToString("yyyy-MM-dd HH:mm")
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(sighting.Comment))
+                            {
+                                <div class="mt-2">
+                                    @sighting.Comment
+                                </div>
+                            }
+
+                            <div class="text-muted small mt-2">
+                                📍 @sighting.Latitude,
+                                @sighting.Longitude
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+
+                                <a class="btn btn-outline-secondary btn-sm"
+                                       asp-controller="Pets"
+                                       asp-action="Details"
+                                       asp-route-id="@sighting.PetId">
+                                    View Pet
+                                </a>
+
+                                <button class="btn btn-outline-danger btn-sm"
+                                        onclick="confirmDeleteSighting(@sighting.Id)">
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5 text-muted">
+                    You haven't reported any sightings yet.
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- ACTIVITY MAP -->
+    <div class="mt-5">
+
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+
+            <h5 class="mb-0">
+                Activity Map
+            </h5>
+
+            <div class="small text-muted">
+                🔵 My Pets &nbsp;&nbsp; 🟢 My Sightings
+            </div>
+
+        </div>
+
+        <div id="activityMap"
+             class="rounded border"
+             style="height:500px;">
+        </div>
+
+    </div>
+
+</div>

@@ -84,7 +84,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-ApplyMigrations(app);
+
+if (!app.Environment.IsDevelopment() &&
+    !app.Environment.IsEnvironment("Testing"))
+{
+    ApplyMigrations(app);
+}
+//ApplyMigrations(app);
 app.Run();
 
 void ApplyMigrations(IApplicationBuilder app)

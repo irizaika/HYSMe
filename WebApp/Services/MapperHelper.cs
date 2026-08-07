@@ -96,7 +96,8 @@ namespace WebApp.Services
             ImageUrl = dto.ImageUrl,
             SeenAddress = dto.SeenAddress,
             ReporterEmail = dto.ReporterEmail,
-            ReporterName = dto.ReporterName
+            ReporterName = dto.ReporterName,
+            PetName = dto.PetName
         };
     }
 }

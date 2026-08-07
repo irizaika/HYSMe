@@ -194,12 +194,12 @@ namespace PetsApi.Controllers
             {
                 var pet = MapperHelper.MapToEntity(dto);
 
-                pet.UserId = User.FindFirst("sub")?.Value;
+                pet.UserId = User?.FindFirst("sub")?.Value ?? "";//to to
 
                 _db.Pets.Add(pet);
                 await _db.SaveChangesAsync();
 
-                var userId = User.FindFirst("sub")?.Value;
+                var userId = User?.FindFirst("sub")?.Value;
                 var petDto = MapperHelper.MapToDto(pet);
                 petDto.IsOwner = pet.UserId == userId;
 

@@ -18,6 +18,7 @@ builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IPetSightingService, PetSightingService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IMyPetsService, MyPetsService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

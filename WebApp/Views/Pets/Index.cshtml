@@ -52,7 +52,7 @@
         LostPetPageController.init({
             petModalController: PetModalController,
             navigationHelper: NavigationHelper,
-            isAuthenticated: @User.Identity.IsAuthenticated.ToString().ToLower()
+            isAuthenticated: @User?.Identity?.IsAuthenticated.ToString().ToLower() ?? ""
         });
  
     </script>

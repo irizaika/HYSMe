@@ -26,6 +26,7 @@ namespace Contracts.Models
         public string? ImageUrl { get; set; }
         public string? ReporterName { get; set; }
         public string? ReporterEmail { get; set; }
+        public string? PetName { get; set; }
 
     }
 }
