@@ -1,7 +1,6 @@
 ﻿using Contracts.Enums;
 using Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi;
 using WebApp.Models;
 using WebApp.Services;
 using WebApp.Services.Interfaces;
@@ -79,7 +78,7 @@ namespace WebApp.Controllers
                   .Cast<PetStatus>()
                   .Select(s => new {
                       Value = (int)s,
-                      Text = s.GetDisplayName()
+                      Text = s.ToString()
                   });
 
                 return Json(pet);
