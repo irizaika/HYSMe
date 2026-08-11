@@ -74,10 +74,8 @@ namespace WebApiPlayWrightTests.Tests
 
             Assert.That(response.IsSuccessStatusCode, Is.True);
 
-            Console.WriteLine(response.StatusCode);
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
-
-
+            //Console.WriteLine(response.StatusCode);
+            //Console.WriteLine(await response.Content.ReadAsStringAsync());
 
             await Page.GotoAsync("/");
 

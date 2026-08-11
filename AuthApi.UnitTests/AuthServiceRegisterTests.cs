@@ -3,7 +3,6 @@ using AuthApi.Models;
 using AuthApi.Services;
 using AuthApi.Services.Interfaces;
 using Contracts.Models;
-using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -52,7 +51,7 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Register(request);
 
-            result.Should().BeNullOrEmpty();
+            Assert.True(result == null || result.Count == 0);
 
             _userManagerMock.Verify(x =>
                 x.CreateAsync(It.Is<ApplicationUser>(u => u.Email == request.Email), request.Password),
@@ -80,8 +79,8 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Register(request);
 
-            result.Should().NotBeNull();
-            result.Should().Contain(e => e.Field == "Email");
+            Assert.NotNull(result);
+            Assert.Contains(result, e => e.Field == "Email");
 
             _userManagerMock.Verify(x =>
                 x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
@@ -108,8 +107,8 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Register(request);
 
-            result.Should().NotBeNull();
-            result.Should().Contain(e => e.Field == "Password");
+            Assert.NotNull(result);
+            Assert.Contains(result, e => e.Field == "Password");
         }
 
         // EXCEPTION HANDLING
@@ -127,8 +126,8 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Register(request);
 
-            result.Should().NotBeNull();
-            result.Should().Contain(e => e.Message == "Error Encountered");
+            Assert.NotNull(result);
+            Assert.Contains(result, e => e.Message == "Error Encountered");
         }
 
         // ---------------- HELPERS ----------------

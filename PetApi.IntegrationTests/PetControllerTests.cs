@@ -227,7 +227,7 @@ namespace PetApi.IntegrationTests
             Assert.Equal(5, content.Data.Items.Count);
 
            int? list = null;
-            Console.WriteLine(list);
+            //Console.WriteLine(list);
         }
 
     }

@@ -26,6 +26,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetApi.IntegrationTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPlayWrightTests", "WebApiPlayWrightTests\WebApiPlayWrightTests.csproj", "{5A1CE7B7-80DF-468E-BA76-5E4C8CD4F737}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{7A2045F9-16EA-4AF3-9D11-5431188FF538}"
+	ProjectSection(SolutionItems) = preProject
+		runtestdotnet.ps1 = runtestdotnet.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +78,7 @@ Global
 		{367F3CFD-ED71-4450-BDAA-E46BBC90E681} = {36A1EE40-2189-4B7F-809D-A63B51E1B03A}
 		{A6289E92-BFCC-4F6B-B377-D5D1B87314EC} = {36A1EE40-2189-4B7F-809D-A63B51E1B03A}
 		{5A1CE7B7-80DF-468E-BA76-5E4C8CD4F737} = {36A1EE40-2189-4B7F-809D-A63B51E1B03A}
+		{7A2045F9-16EA-4AF3-9D11-5431188FF538} = {969C3545-D3AD-461D-8771-CE94A964F039}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64936EF2-47B9-411D-ACD7-44651B86931E}

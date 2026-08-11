@@ -3,21 +3,29 @@ using PetsApi.Data;
 
 namespace PetsApi.Controllers
 {
-//#if DEBUG
     [ApiController]
     [Route("test")]
     public class TestController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public TestController(AppDbContext db)
+        public TestController(
+            AppDbContext db,
+            IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         [HttpPost("reset")]
         public async Task<IActionResult> Reset()
         {
+
+            if (!_env.IsEnvironment("Testing"))
+            {
+                return NotFound();
+            }
             var pets = _db.Pets.Where(p => p.Name.StartsWith("Test"));
 
             _db.Pets.RemoveRange(pets);
@@ -29,4 +37,3 @@ namespace PetsApi.Controllers
         }
     }
 }
-//#endif

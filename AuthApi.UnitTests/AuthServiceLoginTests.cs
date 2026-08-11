@@ -3,7 +3,6 @@ using AuthApi.Models;
 using AuthApi.Services;
 using AuthApi.Services.Interfaces;
 using Contracts.Models;
-using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -58,9 +57,9 @@ namespace AuthApi.UnitTests
             var result = await serviceUnderTest.Login(request);
 
             // Assert
-            result.Should().NotBeNull();
-            result.User.Should().NotBeNull();
-            result.Token.Should().Be("fake-jwt");
+            Assert.NotNull(result);
+            Assert.NotNull(result.User);
+            Assert.Equal("fake-jwt", result.Token);
 
             _jwtMock.Verify(x => x.GenerateToken(user,
                 It.Is<IEnumerable<string>>(roles => roles.Contains("Admin"))), Times.Once);
@@ -84,11 +83,11 @@ namespace AuthApi.UnitTests
             var result = await serviceUnderTest.Login(request);
 
             // Assert
-            result.Should().NotBeNull();
-            result.User.Should().BeNull();
-            result.Token.Should().Be("");
-            result.Error.Field.Should().Be("UserName");
-            result.Error.Message.Should().Be("User does not exist");
+            Assert.NotNull(result);
+            Assert.Null(result.User);
+            Assert.Equal("", result.Token);
+            Assert.Equal("UserName", result.Error.Field);
+            Assert.Equal("User does not exist", result.Error.Message);
 
             _jwtMock.Verify(x => x.GenerateToken(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()), Times.Never);
 
@@ -119,11 +118,11 @@ namespace AuthApi.UnitTests
             var result = await serviceUnderTest.Login(request);
 
             // Assert
-            result.Should().NotBeNull();
-            result.User.Should().BeNull();
-            result.Token.Should().Be("");
-            result.Error.Field.Should().Be("Password");
-            result.Error.Message.Should().Be("Invalid password");
+            Assert.NotNull(result);
+            Assert.Null(result.User);
+            Assert.Equal("", result.Token);
+            Assert.Equal("Password", result.Error.Field);
+            Assert.Equal("Invalid password", result.Error.Message);
 
             _jwtMock.Verify(x => x.GenerateToken(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>()), Times.Never);
         }
@@ -147,7 +146,7 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Login(request);
 
-            result.User.Should().NotBeNull();
+            Assert.NotNull(result.User);
         }
 
         [Fact]
@@ -164,10 +163,10 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Login(request);
 
-            result.User.Should().BeNull();
-            result.Token.Should().Be("");
-            result.Error.Field.Should().Be("Password");
-            result.Error.Message.Should().Be("Password is required");
+            Assert.Null(result.User);
+            Assert.Equal("", result.Token);
+            Assert.Equal("Password", result.Error.Field);
+            Assert.Equal("Password is required", result.Error.Message);
         }
 
         [Fact]
@@ -184,10 +183,10 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Login(request);
 
-            result.User.Should().BeNull();
-            result.Token.Should().Be("");
-            result.Error.Field.Should().Be("Password");
-            result.Error.Message.Should().Be("Password is required");
+            Assert.Null(result.User);
+            Assert.Equal("", result.Token);
+            Assert.Equal("Password", result.Error.Field);
+            Assert.Equal("Password is required", result.Error.Message);
         }
 
         [Fact]
@@ -201,7 +200,7 @@ namespace AuthApi.UnitTests
 
             var result = await serviceUnderTest.Login(request);
 
-            result.User.Should().BeNull();
+            Assert.Null(result.User);
         }
 
 

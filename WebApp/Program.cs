@@ -2,8 +2,19 @@ using WebApp.Services;
 using WebApp.Services.Interfaces;
 using WebApp.Utility;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// load css for testing
+if (builder.Environment.IsDevelopment() ||
+    builder.Environment.IsEnvironment("Testing"))
+{
+    StaticWebAssetsLoader.UseStaticWebAssets(
+        builder.Environment,
+        builder.Configuration);
+}
+
 
 SD.APIBase = builder.Configuration["ServiceUrls:API"];
 SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
@@ -33,7 +44,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() ||
+    app.Environment.IsEnvironment("Testing"))
+{
+    // Development/Testing
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

@@ -1,9 +1,7 @@
 ﻿using AuthApi.Models;
 using AuthApi.Services;
-using FluentAssertions;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace AuthApi.UnitTests
 {
@@ -30,7 +28,9 @@ namespace AuthApi.UnitTests
 
             var token = _generator.GenerateToken(user, new List<string>());
 
-            token.Should().NotBeNullOrEmpty();
+            Assert.False(string.IsNullOrEmpty(token));
+
+            //token.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
@@ -42,11 +42,11 @@ namespace AuthApi.UnitTests
 
             var jwt = ReadToken(token);
 
-            jwt.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Email && c.Value == user.Email);
-            jwt.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == user.Id);
-            //jwt.Claims.Should().Contain(c => c.Type == ClaimTypes.NameIdentifier && c.Value == user.Id); // not there
-            jwt.Claims.Should().Contain(c => c.Type == "nameid" && c.Value == user.Id); // it there as NameId
-            jwt.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Name && c.Value == user.UserName);
+            Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Email && c.Value == user.Email);
+            Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == user.Id);
+            //Assert.Contains(jwt.Claims, c => c.Type == ClaimTypes.NameIdentifier && c.Value == user.Id); // not there
+            Assert.Contains(jwt.Claims, c => c.Type == "nameid" && c.Value == user.Id); // it there as NameId
+            Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Name && c.Value == user.UserName);
         }
 
         [Fact]
@@ -59,10 +59,10 @@ namespace AuthApi.UnitTests
 
             var jwt = ReadToken(token);
 
-            //jwt.Claims.Should().Contain(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
-            //jwt.Claims.Should().Contain(c => c.Type == ClaimTypes.Role && c.Value == "User");
-            jwt.Claims.Should().Contain(c => c.Type == "role" && c.Value == "Admin");
-            jwt.Claims.Should().Contain(c => c.Type == "role" && c.Value == "User");
+            // Assert.Contains(jwt.Claims, c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+            // Assert.Contains(jwt.Claims, c => c.Type == ClaimTypes.Role && c.Value == "User");
+            Assert.Contains(jwt.Claims, c => c.Type == "role" && c.Value == "Admin");
+            Assert.Contains(jwt.Claims, c => c.Type == "role" && c.Value == "User");
         }
 
         [Fact]
@@ -74,8 +74,8 @@ namespace AuthApi.UnitTests
 
             var jwt = ReadToken(token);
 
-            jwt.Issuer.Should().Be("test-issuer");
-            jwt.Audiences.Should().Contain("test-audience");
+            Assert.Equal("test-issuer", jwt.Issuer);
+            Assert.Contains("test-audience", jwt.Audiences);
         }
 
         [Fact]
@@ -87,10 +87,10 @@ namespace AuthApi.UnitTests
 
             var jwt = ReadToken(token);
 
-            jwt.ValidTo.Should().BeAfter(DateTime.UtcNow);
+            Assert.True(jwt.ValidTo > DateTime.UtcNow);
         }
 
-        [Fact]
+            [Fact]
         public void GenerateToken_ShouldHandleNullFields()
         {
             var user = new ApplicationUser
@@ -104,7 +104,7 @@ namespace AuthApi.UnitTests
 
             var jwt = ReadToken(token);
 
-            jwt.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Email);
+            Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Email);
         }
 
         [Fact]
@@ -121,10 +121,11 @@ namespace AuthApi.UnitTests
 
             var user = GetUser();
 
-            Action act = () => generator.GenerateToken(user, new List<string>());
+            var exception = Assert.Throws<Exception>(
+                () => generator.GenerateToken(user, new List<string>())
+               );
 
-            act.Should().Throw<Exception>()
-                .WithMessage("Token generation failed");
+            Assert.Equal("Token generation failed", exception.Message);
         }
 
         // -------- HELPERS --------
