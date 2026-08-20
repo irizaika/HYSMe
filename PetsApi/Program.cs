@@ -85,11 +85,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-if (!app.Environment.IsDevelopment() &&
-    !app.Environment.IsEnvironment("Testing"))
-{
+//if (!app.Environment.IsDevelopment() &&
+//    !app.Environment.IsEnvironment("Testing"))
+//{
     ApplyMigrations(app);
-}
+//}
 //ApplyMigrations(app);
 app.Run();
 

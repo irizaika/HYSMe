@@ -67,7 +67,8 @@ public class PetDetailsTests : AuthenticatedPageTest
     public async Task DetailsBackPreservesSearch()
     {
         await Page.GotoAsync(
-            "/Pets?search=dog&page=2"
+            //"/Pets?search=dog&page=2"
+            "/Pets?search=ri&page=2"
         );
 
 
@@ -87,7 +88,8 @@ public class PetDetailsTests : AuthenticatedPageTest
 
         await Expect(Page)
             .ToHaveURLAsync(
-                new Regex("search=dog")
+                //new Regex("search=dog")
+                new Regex("search=ri")
             );
 
 

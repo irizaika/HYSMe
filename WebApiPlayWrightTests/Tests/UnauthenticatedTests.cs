@@ -1,29 +1,23 @@
 ﻿using Microsoft.Playwright;
+using WebApiPlayWrightTests.Fixture;
 
-namespace WebApiPlayWrightTests.Tests
+namespace WebApiPlayWrightTests.Tests;
+
+[TestFixture]
+public class UnauthenticatedTests : BasePageTest
 {
-    [Parallelizable(ParallelScope.Self)]
-    [TestFixture]
-    public class UnauthenticatedTests : PageTest
+    [Test]
+    public async Task GoToLogin()
     {
-        public override BrowserNewContextOptions ContextOptions()
-        {
-            return new()
-            {
-                BaseURL = "https://localhost:7084"
-            };
-        }
+        await Page.GotoAsync("/");
 
-        [Test]
-        public async Task GoToLogin()
-        {
-           await Page.GotoAsync("/");
-         //   await Page.GotoAsync("https://localhost:7084/");
+        await Page
+            .GetByRole(
+                AriaRole.Button,
+                new() { Name = "+ Report Lost" })
+            .ClickAsync();
 
-            await Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "+ Report Lost" })
-                .ClickAsync();
-
-            await Expect(Page).ToHaveURLAsync(new Regex(".*Login.*"));
-        }
+        await Expect(Page)
+            .ToHaveURLAsync(new Regex(".*Login.*"));
     }
 }

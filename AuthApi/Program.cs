@@ -86,10 +86,10 @@ app.MapControllers();
 
 
 
-if (!app.Environment.IsEnvironment("Testing"))
-{
+//if (!app.Environment.IsEnvironment("Testing"))
+//{
     ApplyMigrations(app);
-}
+//}
 
 app.Run();
 

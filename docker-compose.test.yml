@@ -1,0 +1,57 @@
+services:
+
+  authapi:
+    build:
+      context: .
+      dockerfile: AuthApi/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+      ConnectionStrings__DefaultConnection: "Data Source=/app/db/auth.db"
+    volumes:
+      - ./db:/app/db
+    ports:
+      - "5001:8080"
+
+  petsapi:
+    build:
+      context: .
+      dockerfile: PetsApi/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+      ConnectionStrings__DefaultConnection: "Data Source=/app/db/pet.db"
+    volumes:
+      - ./db:/app/db
+    ports:
+      - "5002:8080"
+
+  webapp:
+    build:
+      context: .
+      dockerfile: WebApp/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+      ServiceUrls__API: "http://petsapi:8080"
+      ServiceUrls__AuthAPI: "http://authapi:8080"
+    ports:
+      - "5000:8080"
+    depends_on:
+      - authapi
+      - petsapi
+
+  playwright:
+    build:
+      context: .
+      dockerfile: WebApiPlayWrightTests/Dockerfile
+    environment:
+      BASE_URL: "http://webapp:8080"
+      PETS_API: "http://petsapi:8080"
+      Playwright__Headless: "true" #must be true for docker
+      Playwright__SlowMo: "0"
+      TEST_RESULTS_DIR: "/test-results"
+
+    volumes:
+      - ./TestResults:/test-results
+    depends_on:
+      - webapp
+      - authapi
+      - petsapi

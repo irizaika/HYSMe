@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Cont
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{969C3545-D3AD-461D-8771-CE94A964F039}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
@@ -28,7 +29,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPlayWrightTests", "We
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{7A2045F9-16EA-4AF3-9D11-5431188FF538}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.test.yml = docker-compose.test.yml
 		runtestdotnet.ps1 = runtestdotnet.ps1
+		runteste2e.ps1 = runteste2e.ps1
 	EndProjectSection
 EndProject
 Global

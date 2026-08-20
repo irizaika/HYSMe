@@ -22,7 +22,7 @@ namespace PetsApi.Controllers
         public async Task<IActionResult> Reset()
         {
 
-            if (!_env.IsEnvironment("Testing"))
+            if (!_env.IsEnvironment("Testing") && !_env.IsEnvironment("Development"))
             {
                 return NotFound();
             }

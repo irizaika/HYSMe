@@ -1,10 +1,8 @@
 ﻿using Microsoft.Playwright;
-using Microsoft.Playwright.NUnit;
-using NUnit.Framework;
 
 namespace WebApiPlayWrightTests.Fixture;
 
-public abstract class AuthenticatedPageTest : PageTest
+public abstract class AuthenticatedPageTest : BasePageTest
 {
     private static bool _initialized;
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
@@ -22,23 +20,29 @@ public abstract class AuthenticatedPageTest : PageTest
             if (_initialized)
                 return;
 
-            using var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
-           // using var playwright = await Playwright.CreateAsync();
+            using var playwright =
+                await Microsoft.Playwright.Playwright.CreateAsync();
 
-            await using var browser = await playwright.Chromium.LaunchAsync(
-                new BrowserTypeLaunchOptions
+            await using var browser =
+                await playwright.Chromium.LaunchAsync(new()
                 {
                     Headless = true
                 });
 
             var context = await browser.NewContextAsync();
-
             var page = await context.NewPageAsync();
 
-            await page.GotoAsync("https://localhost:7084/auth/login");
+            Console.WriteLine($"BASE_URL = {BaseUrl}");
 
-            await page.FillAsync("#UserName", "email@email.com");
-            await page.FillAsync("#Password", "Admin01!");
+            await page.GotoAsync($"{BaseUrl}/auth/login");
+
+            await page.FillAsync(
+                "#UserName",
+                "email@email.com");
+
+            await page.FillAsync(
+                "#Password",
+                "Admin01!");
 
             await page.ClickAsync("button[type=submit]");
 
@@ -48,6 +52,8 @@ public abstract class AuthenticatedPageTest : PageTest
             {
                 Path = "storageState.json"
             });
+
+            await context.CloseAsync();
 
             _initialized = true;
         }
@@ -59,9 +65,9 @@ public abstract class AuthenticatedPageTest : PageTest
 
     public override BrowserNewContextOptions ContextOptions()
     {
-        return new()
+        return new BrowserNewContextOptions
         {
-            BaseURL = "https://localhost:7084",
+            BaseURL = BaseUrl,
             StorageStatePath = "storageState.json"
         };
     }

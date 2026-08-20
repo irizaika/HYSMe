@@ -68,11 +68,19 @@ namespace WebApiPlayWrightTests.Tests
             //clear db
             using var client = new HttpClient();
 
-            var response = await client.PostAsync(
-                "https://localhost:7001/test/reset",
-                null);
 
-            Assert.That(response.IsSuccessStatusCode, Is.True);
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PETS_API")))
+            {
+
+                var response = await client.PostAsync("https://localhost:7001/test/reset", null);
+                Assert.That(response.IsSuccessStatusCode, Is.True);
+
+            }
+            else
+            {
+                var response = await client.PostAsync(Environment.GetEnvironmentVariable("PETS_API") + "/test/reset", null);
+                Assert.That(response.IsSuccessStatusCode, Is.True);
+            }
 
             //Console.WriteLine(response.StatusCode);
             //Console.WriteLine(await response.Content.ReadAsStringAsync());

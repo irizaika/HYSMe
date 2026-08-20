@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+WORKDIR /src
+
+COPY ["WebApiPlayWrightTests/WebApiPlayWrightTests.csproj", "WebApiPlayWrightTests/"]
+COPY ["Contracts/Contracts.csproj", "Contracts/"]
+
+RUN dotnet restore "WebApiPlayWrightTests/WebApiPlayWrightTests.csproj"
+
+COPY . .
+
+RUN dotnet build "WebApiPlayWrightTests/WebApiPlayWrightTests.csproj" \
+    -c Release \
+    --no-restore
+
+RUN pwsh WebApiPlayWrightTests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+
+WORKDIR /src/WebApiPlayWrightTests
+
+ENTRYPOINT ["dotnet", "test", "--no-build", "-c", "Release"]

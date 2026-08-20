@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/.vs/
+.vs/
+.git/
+.gitignore
+
+**/TestResults/
+**/playwright-report/
+**/test-results/
+
+*.user
+*.suo
