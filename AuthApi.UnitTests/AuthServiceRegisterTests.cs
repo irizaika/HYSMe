@@ -68,8 +68,9 @@ namespace AuthApi.UnitTests
                 Email = "test@test.com"
             };
 
-            _dbContext.ApplicationUsers.Add(existingUser);
-            _dbContext.SaveChanges();
+            _userManagerMock
+                .Setup(x => x.FindByEmailAsync("test@test.com"))
+                .ReturnsAsync(existingUser);
 
             var request = new RegistrationRequestDto
             {
@@ -83,8 +84,8 @@ namespace AuthApi.UnitTests
             Assert.Contains(result, e => e.Field == "Email");
 
             _userManagerMock.Verify(x =>
-                x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
-                Times.Never);
+                    x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
+                    Times.Never);
         }
 
         // IDENTITY FAILURE (e.g. weak password)

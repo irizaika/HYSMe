@@ -96,16 +96,6 @@ namespace AuthApi.UnitTests
         [Fact]
         public async Task Login_ShouldNotReturnToken_WhenPasswordIsInvalid()
         {
-            // no setup needed — user won't be found
-            //_userManagerMock.Setup(x => x.CheckPasswordAsync(user, "password"))
-            //    .ReturnsAsync(true);
-
-            //_userManagerMock.Setup(x => x.GetRolesAsync(user))
-            //    .ReturnsAsync(new List<string> { "Admin" });
-
-            //_jwtMock.Setup(x => x.GenerateToken(user, It.IsAny<IEnumerable<string>>()))
-            //    .Returns("fake-jwt");
-
             SetupValidLogin();
 
             var request = new LoginRequestDto
@@ -135,14 +125,7 @@ namespace AuthApi.UnitTests
                 Password = "password"
             };
 
-            _userManagerMock.Setup(x => x.CheckPasswordAsync(user, "password"))
-                .ReturnsAsync(true);
-
-            _userManagerMock.Setup(x => x.GetRolesAsync(user))
-                .ReturnsAsync(new List<string> { "Admin" });
-
-            _jwtMock.Setup(x => x.GenerateToken(user, It.IsAny<IEnumerable<string>>()))
-                .Returns("fake-jwt");
+            SetupValidLogin();
 
             var result = await serviceUnderTest.Login(request);
 
@@ -240,8 +223,15 @@ namespace AuthApi.UnitTests
 
         private void SetupValidLogin()
         {
+            _userManagerMock
+                .Setup(x => x.NormalizeName(It.IsAny<string>()))
+                .Returns((string name) => name.ToLowerInvariant());
+
+            _userManagerMock.Setup(x => x.FindByNameAsync("test@test.com"))
+                .ReturnsAsync(user);
+
             _userManagerMock.Setup(x => x.CheckPasswordAsync(user, "password"))
-                .ReturnsAsync(true);
+                    .ReturnsAsync(true);
 
             _userManagerMock.Setup(x => x.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "Admin" });

@@ -1,6 +1,7 @@
 using AuthApi.Data;
 using AuthApi.Models;
 using Contracts.Models;
+using Microsoft.AspNetCore.Identity;
 using System.Net.Http.Json;
 
 namespace AuthApi.IntegrationTests
@@ -42,14 +43,19 @@ namespace AuthApi.IntegrationTests
         public async Task Register_EmailExists_ShouldReturnBadRequest()
         {
             using var scope = _factory.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            db.ApplicationUsers.Add(new ApplicationUser
-            {
-                Email = "exists@test.com",
-                UserName = "exists@test.com"
-            });
-            db.SaveChanges();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var result = await userManager.CreateAsync(
+                new ApplicationUser
+                {
+                    Email = "exists@test.com",
+                    UserName = "exists@test.com",
+                    Name = "Existing User"
+                },
+                "Password123!");
+
+            Assert.True(result.Succeeded);
 
             var response = await _client.PostAsJsonAsync("/api/auth/register", new
             {

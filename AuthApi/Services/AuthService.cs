@@ -24,18 +24,22 @@ namespace AuthApi.Services
 
         public async Task<bool> AssignRole(string email, string roleName)
         {
-            var user = _db.ApplicationUsers.FirstOrDefault(u => u.Email != null && u.Email.ToLower() == email.ToLower());
-            if (user != null)
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
             {
-                if (!_roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult())
-                {
-                    //create role if it does not exist
-                    _roleManager.CreateAsync(new IdentityRole(roleName)).GetAwaiter().GetResult();
-                }
-                await _userManager.AddToRoleAsync(user, roleName);
-                return true;
+                return false;
             }
-            return false;
+
+            if (!await _roleManager.RoleExistsAsync(roleName))
+            {
+                await _roleManager.CreateAsync(
+                    new IdentityRole(roleName));
+            }
+
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+
+            return result.Succeeded;
 
         }
 
@@ -51,7 +55,9 @@ namespace AuthApi.Services
                 return FailedLoginResponse("Password is required", nameof(loginRequestDto.Password));
             }
 
-            var user = _db.ApplicationUsers.FirstOrDefault(u => u.UserName != null && u.UserName.ToLower() == loginRequestDto.UserName.ToLower());
+            var normalizedUserName = _userManager.NormalizeName(loginRequestDto.UserName);
+
+            var user = await _userManager.FindByNameAsync(normalizedUserName);
 
             if (user == null)
             {
@@ -88,16 +94,10 @@ namespace AuthApi.Services
 
         public async Task<List<Error>?> Register(RegistrationRequestDto registrationRequestDto)
         {
-            var checkIfExists = _db.ApplicationUsers.Any(u => u.UserName == registrationRequestDto.Email);
+            var email = await _userManager.FindByEmailAsync(registrationRequestDto.Email);
 
-            var all = _db.ApplicationUsers.ToList();
 
-            foreach (var a in all)
-            {
-               System.Diagnostics.Debug.WriteLine(a.Email);
-            }
-
-            if (checkIfExists == true)
+            if (email != null)
             {
                 return [new() {Message = "Email already registered", Field = "Email"}];
             }
